@@ -1,588 +1,401 @@
-# Translation Evaluation Tool - Usage Guide
+# Usage Guide - Arabic-Urdu Translation and Evaluation System
 
-## Overview
+This comprehensive guide will walk you through all the features and workflows of the Arabic-Urdu Translation and Evaluation System.
 
-This comprehensive tool is designed for **Arabic-to-Urdu translation with AI-powered LLM capabilities**, evaluation, and refinement. It supports both existing translation review and AI-generated translations using Claude API, providing a complete translation workflow from file upload to ground truth storage.
+## 📋 Table of Contents
 
-## Quick Start
+1. [Getting Started](#getting-started)
+2. [File Upload and Processing](#file-upload-and-processing)
+3. [LLM Translation Workflow](#llm-translation-workflow)
+4. [LLM Configuration Management](#llm-configuration-management)
+5. [Translation Approval Process](#translation-approval-process)
+6. [Evaluation System](#evaluation-system)
+7. [Ground Truth Management](#ground-truth-management)
+8. [Troubleshooting](#troubleshooting)
 
-### 1. Configure Claude API Key
-
-**Required for LLM translation features:**
-
-```bash
-# Method 1: Environment Variable (Recommended)
-export ANTHROPIC_API_KEY="your-claude-api-key-here"
-
-# Method 2: .env File
-echo "ANTHROPIC_API_KEY=your-claude-api-key-here" > .env
-
-# Method 3: Direct in Command
-ANTHROPIC_API_KEY="your-key" docker-compose up -d
-```
-
-### 2. Start the System
-
-```bash
-# Clone the repository
-git clone <repository-url>
-cd Translation
-
-# Start all services
-./start.sh
-
-# Or manually with Docker Compose
-docker-compose up -d
-```
-
-### 3. Access the Application
-
-- **Frontend**: http://localhost:3000
-- **API Gateway**: http://localhost:8000
-- **Health Check**: http://localhost:8000/health
-
-### 4. Upload Files
-
-The system accepts files in multiple ways:
-
-#### File Upload Methods
-1. **Drag & Drop**: Upload .srt or .json files directly
-2. **URL Upload**: Provide direct links to .srt or .json files
-3. **Browse Files**: Traditional file selection
-
-#### Supported Formats
-
-**SRT Format** (with existing translations):
-```
-1
-00:00:01,000 --> 00:00:04,000
-مرحبا بكم في الأخبار
-خبروں میں خوش آمدید
-
-2
-00:00:04,500 --> 00:00:07,500
-هذا تقرير إخباري من الشرق الأوسط
-یہ مشرق وسطی سے ایک خبری رپورٹ ہے
-```
-
-**JSON Format** (with existing translations):
-```json
-{
-  "metadata": {
-    "title": "Arabic-Urdu News Broadcast",
-    "language_pair": "ar-ur"
-  },
-  "segments": [
-    {
-      "start_time": "00:00:01.000",
-      "end_time": "00:00:04.000",
-      "original_text": "مرحبا بكم في الأخبار",
-      "translated_text": "خبروں میں خوش آمدید"
-    }
-  ]
-}
-```
-
-**For LLM Translation**: Upload files with only Arabic text (no existing translations)
-
-## Architecture
-
-### Microservices
-
-1. **Input Service** (Port 8001)
-   - Handles file uploads (.srt, .json)
-   - **URL-based file downloads**
-   - Parses files with or without existing translations
-   - Validates file formats
-
-2. **Translation Service** (Port 8002)
-   - Reviews and validates existing translations
-   - **LLM-powered translation using Claude API**
-   - **Configurable system prompts**
-   - **Quality metrics and confidence scoring**
-   - Manages review workflows
-
-3. **Evaluation Service** (Port 8003)
-   - User authentication and authorization
-   - Review management interface
-   - Role-based access control
-
-4. **Storage Service** (Port 8004)
-   - Ground truth data storage
-   - Export functionality (JSON, CSV, Excel)
-   - Metrics and analytics
-
-5. **API Gateway** (Port 8000)
-   - Request routing and load balancing
-   - Authentication middleware
-   - Rate limiting
-
-6. **Frontend** (Port 3000)
-   - **Modern React-based web interface**
-   - **Real-time translation progress**
-   - **Interactive metrics dashboard**
-   - **Professional UI with Tailwind CSS**
-
-## 🧠 LLM Translation Features
-
-### System Prompt Configuration
-
-#### Method 1: Environment Variable
-```bash
-export CLAUDE_SYSTEM_PROMPT="Your custom system prompt here"
-docker-compose up -d
-```
-
-#### Method 2: UI Configuration
-1. Access the frontend at http://localhost:3000
-2. Navigate to "Translation Jobs" tab
-3. Click "Show Config" button
-4. Edit the system prompt and save
-
-#### Method 3: API Update
-```bash
-curl -X POST http://localhost:8000/translate/llm/config \
-  -H "Content-Type: application/json" \
-  -d '{"system_prompt": "Your custom prompt"}'
-```
-
-### Default System Prompt
-The system comes with a comprehensive accuracy-focused prompt:
-```
-You are a highly skilled translator specializing in Arabic to Urdu translation. 
-Your task is to translate the given Arabic text into Urdu with 100% accuracy. 
-This requires careful attention to detail, cultural nuances, and linguistic precision.
-
-To ensure 100% accuracy in your translation, follow these steps:
-1. Read the entire Arabic text carefully to understand the context and meaning.
-2. Translate the text sentence by sentence, paying close attention to grammar, vocabulary, and idiomatic expressions.
-3. Consider any cultural references or nuances that may require special attention in translation.
-4. Double-check your translation for any potential errors or misinterpretations.
-5. Ensure that the Urdu translation maintains the tone and style of the original Arabic text.
-
-Present your final Urdu translation within <urdu_translation> tags. 
-If you have any notes or explanations about specific translation choices, 
-include them after the translation within <translation_notes> tags.
-```
-
-### Claude Model Selection
-Choose from different Claude models based on your needs:
-- **Claude 3 Sonnet**: Balanced performance and speed (default)
-- **Claude 3 Opus**: Highest performance, slower speed
-- **Claude 3 Haiku**: Fastest speed, good performance
-
-## API Endpoints
-
-### Input Service
-
-```bash
-# Upload file with existing translations
-POST /upload
-Content-Type: multipart/form-data
-
-# Upload file from URL
-POST /upload/url
-{
-  "file_url": "https://example.com/file.srt"
-}
-
-# List uploaded files
-GET /files
-
-# Get file content
-GET /files/{file_id}/content
-```
-
-### Translation Service
-
-#### Traditional Review Endpoints
-```bash
-# Start review job
-POST /review
-{
-  "file_id": "uuid",
-  "segments": [...],
-  "reviewer_id": "optional"
-}
-
-# Get review status
-GET /status/{review_id}
-
-# List all reviews
-GET /reviews
-
-# Cancel review
-DELETE /reviews/{review_id}
-```
-
-#### 🧠 LLM Translation Endpoints (NEW)
-```bash
-# Start LLM translation job
-POST /translate/llm
-{
-  "file_id": "uuid",
-  "segments": [
-    {
-      "segment_id": "1",
-      "original_text": "مرحبا بكم في الأخبار"
-    }
-  ]
-}
-
-# Get LLM translation status and results
-GET /translate/llm/{job_id}
-
-# List all LLM translation jobs
-GET /translate/llm
-
-# Update specific segment translation
-POST /translate/llm/{job_id}/update
-{
-  "segment_id": "1",
-  "translation": "Updated Urdu translation"
-}
-
-# Get LLM translation metrics
-GET /translate/llm/metrics
-
-# Get/Update LLM configuration
-GET /translate/llm/config
-POST /translate/llm/config
-{
-  "system_prompt": "Custom prompt",
-  "model": "claude-3-sonnet-20240229"
-}
-```
-
-### Evaluation Service
-
-```bash
-# User authentication
-POST /auth/login
-POST /auth/logout
-
-# Review management
-GET /evaluations
-POST /evaluations/{review_id}/approve
-POST /evaluations/{review_id}/reject
-```
-
-### Storage Service
-
-```bash
-# Ground truth management
-GET /ground-truth
-POST /ground-truth/export
-GET /metrics
-
-# Export in different formats
-GET /export/json
-GET /export/csv
-GET /export/excel
-```
-
-## Workflows
-
-### 1. Traditional Translation Review Workflow
-1. **File Upload**: Upload SRT or JSON files with existing Arabic-Urdu translations
-2. **System Review**: Automatic review of existing translations
-3. **Human Evaluation**: Review flagged segments
-4. **Ground Truth Storage**: Store approved translations
-
-### 2. 🧠 LLM Translation Workflow (NEW)
-1. **File Upload**: Upload files with Arabic text only
-2. **LLM Configuration**: Set system prompt and model (optional)
-3. **Start Translation**: Initiate AI-powered translation
-4. **Monitor Progress**: Real-time progress tracking
-5. **Review & Edit**: Review AI-generated translations
-6. **Quality Assessment**: Check confidence scores and metrics
-7. **Ground Truth Storage**: Store approved translations
-
-### 3. Hybrid Workflow
-1. **File Upload**: Upload files with partial translations
-2. **LLM Translation**: Generate missing translations
-3. **Human Review**: Review and edit all segments
-4. **Quality Control**: Ensure consistency and accuracy
-5. **Export**: Generate final translation files
-
-## Configuration
-
-### Environment Variables
-
-```bash
-# Required for LLM Translation
-ANTHROPIC_API_KEY=your-claude-api-key-here
-
-# Optional LLM Configuration
-CLAUDE_SYSTEM_PROMPT="Your custom system prompt"
-CLAUDE_MODEL=claude-3-sonnet-20240229
-
-# Database
-DATABASE_URL=sqlite:///./data/app.db
-
-# Authentication
-JWT_SECRET=your-secret-key
-JWT_ALGORITHM=HS256
-
-# File Storage
-UPLOAD_FOLDER=./uploads
-MAX_FILE_SIZE=10485760
-
-# Review Settings
-QUALITY_THRESHOLD=0.7
-REVIEW_TIMEOUT=3600
-```
-
-### Docker Configuration
-
-```yaml
-# docker-compose.yml
-version: '3.8'
-services:
-  input-service:
-    environment:
-      - UPLOAD_FOLDER=/app/uploads
-      - DATABASE_URL=sqlite:///./data/input.db
-  
-  translation-service:
-    environment:
-      - MODEL_PATH=/app/models
-      - QUALITY_THRESHOLD=0.7
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-your-key}
-      - CLAUDE_SYSTEM_PROMPT=${CLAUDE_SYSTEM_PROMPT:-default-prompt}
-```
-
-## Development
-
-### Local Development Setup
-
-```bash
-# Install dependencies
-cd services/input-service && pip install -r requirements.txt
-cd ../translation-service && pip install -r requirements.txt
-cd ../evaluation-service && pip install -r requirements.txt
-cd ../storage-service && pip install -r requirements.txt
-cd ../api-gateway && pip install -r requirements.txt
-cd ../../frontend && npm install
-
-# Start services individually
-cd services/input-service && python main.py
-cd ../translation-service && python main.py
-# ... repeat for other services
-
-# Start frontend
-cd frontend && npm start
-```
-
-### Testing
-
-```bash
-# Run tests for each service
-cd services/input-service && python -m pytest
-cd ../translation-service && python -m pytest
-cd ../evaluation-service && python -m pytest
-cd ../storage-service && python -m pytest
-
-# Run frontend tests
-cd frontend && npm test
-```
-
-## Monitoring
-
-### Health Checks
-
-```bash
-# Check service health
-curl http://localhost:8000/health
-curl http://localhost:8001/health
-curl http://localhost:8002/health
-curl http://localhost:8003/health
-curl http://localhost:8004/health
-```
-
-### Metrics
-
-```bash
-# Get review statistics
-curl http://localhost:8002/stats
-
-# Get LLM translation metrics
-curl http://localhost:8002/translate/llm/metrics
-
-# Get evaluation metrics
-curl http://localhost:8003/metrics
-
-# Get storage metrics
-curl http://localhost:8004/metrics
-```
-
-## Troubleshooting
-
-### Common Issues
-
-1. **LLM Translation Not Working**
-   - Check if ANTHROPIC_API_KEY is set
-   - Verify API key validity
-   - Check translation service logs
-   - Ensure Claude API access
-
-2. **File Upload Fails**
-   - Check file format (SRT or JSON)
-   - Verify file size limits
-   - Ensure proper encoding (UTF-8)
-   - For URL uploads, check URL accessibility
-
-3. **Review Jobs Not Starting**
-   - Check translation service health
-   - Verify file parsing
-   - Check database connectivity
-
-4. **Authentication Issues**
-   - Verify JWT configuration
-   - Check user credentials
-   - Ensure proper CORS settings
-
-5. **Frontend Not Loading**
-   - Check React development server
-   - Verify API gateway connectivity
-   - Check browser console for errors
-
-### Logs
-
-```bash
-# View service logs
-docker-compose logs input-service
-docker-compose logs translation-service
-docker-compose logs evaluation-service
-docker-compose logs storage-service
-docker-compose logs api-gateway
-docker-compose logs frontend
-
-# Follow logs in real-time
-docker-compose logs -f translation-service
-```
-
-## Production Deployment
+## 🚀 Getting Started
 
 ### Prerequisites
+- Docker and Docker Compose installed
+- Anthropic API key (or other supported LLM provider)
+- Modern web browser
 
-- Docker and Docker Compose
-- PostgreSQL database
-- SSL certificate
-- Reverse proxy (nginx)
-- **Valid Claude API key**
+### Initial Setup
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/awaisijaz1/arabic-urdu-translation-system.git
+   cd arabic-urdu-translation-system
+   ```
 
-### Production Configuration
+2. **Configure API keys**
+   ```bash
+   # Create .env file
+   echo "ANTHROPIC_API_KEY=your_api_key_here" > .env
+   ```
 
-```yaml
-# docker-compose.prod.yml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:13
-    environment:
-      POSTGRES_DB: translation_eval
-      POSTGRES_USER: app_user
-      POSTGRES_PASSWORD: secure_password
-    
-  redis:
-    image: redis:6-alpine
-    
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
+3. **Start the services**
+   ```bash
+   docker-compose up -d
+   ```
+
+4. **Access the application**
+   - Frontend: http://localhost:3000
+   - API Gateway: http://localhost:8000
+
+## 📁 File Upload and Processing
+
+### Supported File Formats
+- **JSON**: Structured data with segments
+- **SRT**: Subtitle files
+- **TXT**: Plain text files
+
+### Upload Process
+1. Navigate to the **File Upload** tab
+2. Choose upload method:
+   - **Drag and Drop**: Drag files directly onto the upload area
+   - **File Browser**: Click to select files
+   - **URL Upload**: Enter file URL for remote files
+3. Select your Arabic file
+4. Wait for processing to complete
+5. View file details and classification
+
+### File Classification
+The system automatically classifies files as:
+
+#### **Arabic-only Files** 🔵
+- Contain only Arabic text
+- Need LLM translation to generate Urdu
+- Status: "Ready for LLM translation"
+- Workflow: Upload → LLM Translation → Arabic-Urdu pairs
+
+#### **Arabic-Urdu Pairs** 🟢
+- Contain both Arabic and Urdu text
+- Ready for evaluation
+- Status: "Ready for evaluation"
+- Workflow: Upload → Direct to evaluation
+
+## 🤖 LLM Translation Workflow
+
+### Starting a Translation Job
+
+1. **Navigate to Translation Jobs**
+   - Go to the **Translation Jobs** tab
+   - View available files for translation
+
+2. **Select a File**
+   - Choose an Arabic-only file
+   - View file details and segment count
+   - Check file classification status
+
+3. **Configure Translation Settings** (Optional)
+   - Click "LLM Configuration" to adjust settings
+   - Select different models or providers
+   - Customize system prompts
+
+4. **Start Translation**
+   - Click "Start LLM Translation"
+   - Monitor real-time progress
+   - View chunk-based processing
+
+### Monitoring Progress
+
+#### **Real-time Updates**
+- **Progress Bar**: Shows overall completion percentage
+- **Chunk Progress**: Individual chunk processing status
+- **Segment Counter**: Completed segments vs total
+- **Quality Metrics**: Live confidence and quality scores
+
+#### **Status Indicators**
+- 🔵 **Pending**: Job created, waiting to start
+- 🟡 **In Progress**: Currently processing
+- 🟢 **Completed**: Translation finished
+- 🔴 **Failed**: Error occurred
+- ✅ **Approved**: Moved to ground truth
+
+### Translation Results
+
+#### **Quality Metrics**
+- **Confidence Score**: LLM confidence (0-1)
+- **Quality Score**: Overall translation quality (0-1)
+- **Translation Time**: Processing time per segment
+- **Length Ratio**: Original vs translated text ratio
+
+#### **Review and Edit**
+- **Side-by-side View**: Original Arabic and translated Urdu
+- **Individual Editing**: Click any segment to edit
+- **Bulk Actions**: Approve, reject, or edit multiple segments
+- **Quality Assessment**: Review confidence and quality scores
+
+## ⚙️ LLM Configuration Management
+
+### Accessing Configuration
+1. Navigate to **LLM Configuration** tab
+2. View current settings and status
+3. Access different configuration sections
+
+### API Provider Management
+
+#### **Adding New Providers**
+1. Go to **API Providers** tab
+2. Click "Add Provider"
+3. Fill in provider details:
+   - **Provider ID**: Unique identifier (e.g., "anthropic")
+   - **Name**: Display name (e.g., "Anthropic")
+   - **API Key**: Your API key
+   - **Base URL**: Optional custom endpoint
+4. Click "Add Provider"
+
+#### **Managing Existing Providers**
+- **Status**: Active/Inactive toggle
+- **API Key Status**: Configured/Not configured
+- **Last Updated**: Timestamp of last change
+
+### Model Management
+
+#### **Available Models**
+- **Claude 3 Sonnet**: Balanced performance and speed
+- **Claude 3 Opus**: Highest performance, slower speed
+- **Claude 3 Haiku**: Fastest speed, good performance
+- **GPT-4**: OpenAI's most capable model
+- **GPT-3.5 Turbo**: Fast and cost-effective
+
+#### **Adding Custom Models**
+1. Go to **Models** tab
+2. Click "Add Model"
+3. Configure model parameters:
+   - **Provider**: Select API provider
+   - **Model ID**: Technical identifier
+   - **Name**: Display name
+   - **Description**: Model description
+   - **Max Tokens**: Maximum output length
+   - **Temperature**: Creativity level (0-2)
+4. Click "Add Model"
+
+### System Prompt Management
+
+#### **Default Prompts**
+- **Standard Translation**: General-purpose translation
+- **News Translation**: Journalistic accuracy focus
+- **Technical Translation**: Technical terminology focus
+
+#### **Creating Custom Prompts**
+1. Go to **System Prompts** tab
+2. Click "Add Prompt"
+3. Configure prompt details:
+   - **Name**: Prompt identifier
+   - **Description**: Purpose and use case
+   - **Content**: The actual system prompt
+   - **Default**: Set as default prompt
+4. Click "Add Prompt"
+
+### Configuration Logs
+- **Change History**: All configuration modifications
+- **User Attribution**: Who made changes
+- **Timestamp**: When changes occurred
+- **Details**: What was changed
+
+## ✅ Translation Approval Process
+
+### Reviewing Translations
+
+1. **Access Completed Jobs**
+   - Go to **Translation Jobs** tab
+   - Find jobs with "Completed" status
+   - Click "View" to see details
+
+2. **Review Individual Segments**
+   - **Original Text**: Arabic source
+   - **Translated Text**: Urdu translation
+   - **Confidence Score**: LLM confidence
+   - **Quality Score**: Overall quality assessment
+
+3. **Edit if Needed**
+   - Click any segment to edit
+   - Modify translation text
+   - Save changes
+   - Continue reviewing
+
+### Approving Translations
+
+1. **Bulk Approval**
+   - Select multiple segments
+   - Click "Approve Selected"
+   - Confirm approval
+
+2. **Individual Approval**
+   - Click "Approve" on individual segments
+   - Add approval notes if needed
+
+3. **Approval Details**
+   - **Approver**: Your username
+   - **Notes**: Optional comments
+   - **Timestamp**: When approved
+   - **Status**: Moved to ground truth
+
+### Approval Workflow
+```
+Translation Job → Review → Edit (optional) → Approve → Ground Truth
 ```
 
-### Security Considerations
+## 📊 Evaluation System
 
-1. **Authentication**
-   - Use strong JWT secrets
-   - Implement rate limiting
-   - Enable HTTPS
+### Starting Evaluation
 
-2. **Data Protection**
-   - Encrypt sensitive data
-   - Regular backups
-   - Access logging
+1. **Select Files for Evaluation**
+   - Go to **Evaluation** tab
+   - View Arabic-Urdu paired files
+   - Select file to evaluate
 
-3. **Network Security**
-   - Firewall configuration
-   - VPN access
-   - **Secure API key management**
+2. **Evaluation Interface**
+   - **Side-by-side View**: Arabic and Urdu text
+   - **Quality Metrics**: Confidence and quality scores
+   - **Evaluation Options**: Approve, reject, edit
 
-4. **LLM Security**
-   - **Store API keys securely**
-   - **Monitor API usage**
-   - **Implement rate limiting for LLM calls**
+3. **Evaluation Process**
+   - Review each segment individually
+   - Assess translation quality
+   - Provide feedback and scores
+   - Submit evaluation results
 
-## Advanced Configuration
+### Evaluation Metrics
+- **Accuracy**: Translation correctness
+- **Fluency**: Natural language flow
+- **Completeness**: All content translated
+- **Overall Score**: Combined assessment
 
-### Custom System Prompts
+## 🗄️ Ground Truth Management
 
-Create domain-specific prompts for better translation quality:
+### Viewing Ground Truth
+1. Navigate to **Ground Truth** tab
+2. View all approved translations
+3. Filter and search through data
+4. Export in various formats
 
+### Ground Truth Features
+- **Complete History**: All approved translations
+- **Quality Metrics**: Confidence and quality scores
+- **Approval Details**: Who approved and when
+- **Export Options**: JSON, CSV, Excel formats
+
+### Data Export
+- **JSON Export**: Structured data format
+- **CSV Export**: Spreadsheet compatibility
+- **Excel Export**: Microsoft Excel format
+- **Filtered Export**: Export selected data only
+
+## 🔧 Troubleshooting
+
+### Common Issues and Solutions
+
+#### **Translation Jobs Not Appearing**
+**Problem**: Jobs disappear after service restart
+**Solution**: 
+- Check persistent storage: `docker exec translation-translation-service-1 cat /app/data/translation_jobs.json`
+- Verify jobs are being saved correctly
+- Check service logs: `docker-compose logs translation-service`
+
+#### **LLM Configuration Not Updating**
+**Problem**: Configuration changes not taking effect
+**Solution**:
+- Check API key status in LLM Configuration
+- Verify provider is active
+- Check API key validity
+- Review configuration logs
+
+#### **Files Not Uploading**
+**Problem**: Upload fails or files not processed
+**Solution**:
+- Check file format (JSON, SRT, TXT supported)
+- Verify file size limits
+- Check file encoding (UTF-8 recommended)
+- Review upload service logs
+
+#### **Service Not Starting**
+**Problem**: Docker containers fail to start
+**Solution**:
+- Check Docker logs: `docker-compose logs`
+- Verify environment variables
+- Check port conflicts
+- Ensure Docker has sufficient resources
+
+### Debugging Commands
+
+#### **Service Health Check**
 ```bash
-# Medical translation
-export CLAUDE_SYSTEM_PROMPT="You are a medical translator specializing in Arabic to Urdu translation. Focus on medical terminology accuracy and patient safety."
+# Check all services
+docker-compose ps
 
-# Legal translation
-export CLAUDE_SYSTEM_PROMPT="You are a legal translator specializing in Arabic to Urdu translation. Maintain legal precision and formal language."
+# Check specific service
+docker-compose logs translation-service
 
-# Technical translation
-export CLAUDE_SYSTEM_PROMPT="You are a technical translator specializing in Arabic to Urdu translation. Preserve technical accuracy and terminology consistency."
+# Check persistent storage
+docker exec translation-translation-service-1 ls -la /app/data/
 ```
 
-### Performance Tuning
-
+#### **API Testing**
 ```bash
-# Adjust translation batch sizes
-# Configure polling intervals for real-time updates
-# Set quality thresholds for automatic approval
-# Optimize Claude model selection based on use case
+# Test API gateway
+curl http://localhost:8000/health
+
+# Test translation service
+curl http://localhost:8000/translate/llm
+
+# Test file upload
+curl -X POST http://localhost:8000/upload -F "file=@your_file.json"
 ```
 
-## Extending the System
+#### **Configuration Verification**
+```bash
+# Check LLM configuration
+curl http://localhost:8000/translate/llm/config
 
-### Adding New File Formats
+# Check API providers
+curl http://localhost:8000/translate/llm/config/providers
 
-1. Create new parser in `services/input-service/parsers.py`
-2. Update `ParserFactory` class
-3. Add format validation
-4. Update documentation
+# Check models
+curl http://localhost:8000/translate/llm/config/models
+```
 
-### Custom Review Logic
+### Performance Optimization
 
-1. Modify `TranslationReviewer` class
-2. Implement custom validation rules
-3. Add quality metrics
-4. Update review thresholds
+#### **Translation Performance**
+- **Batch Size**: Adjust chunk size for optimal performance
+- **Model Selection**: Choose appropriate model for your needs
+- **API Limits**: Monitor rate limits and usage
+- **Caching**: Enable caching for repeated translations
 
-### Additional Export Formats
+#### **System Resources**
+- **Memory**: Ensure sufficient RAM for large files
+- **CPU**: Monitor CPU usage during translation
+- **Storage**: Check available disk space
+- **Network**: Stable internet connection for API calls
 
-1. Add export handlers in storage service
-2. Implement format converters
-3. Update API endpoints
-4. Add frontend support
+## 📈 Best Practices
 
-### Custom LLM Integration
+### **File Preparation**
+- Use UTF-8 encoding for Arabic text
+- Clean and validate input data
+- Structure JSON files properly
+- Include segment IDs for tracking
 
-1. Modify `LLMTranslator` class
-2. Add support for other LLM providers
-3. Implement custom prompt templates
-4. Add provider-specific configurations
+### **Translation Quality**
+- Review translations carefully before approval
+- Use appropriate system prompts for your domain
+- Monitor quality metrics and confidence scores
+- Edit translations when needed
 
-## Support
+### **System Maintenance**
+- Regular backups of persistent storage
+- Monitor API usage and costs
+- Update system prompts for better results
+- Review configuration logs regularly
 
-For issues and questions:
+### **Workflow Optimization**
+- Use file classification to streamline workflow
+- Leverage existing translations when available
+- Batch process similar files together
+- Maintain consistent approval standards
 
-1. Check the troubleshooting section
-2. Review service logs
-3. Verify configuration
-4. **Check Claude API status and usage**
-5. Contact development team
+---
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
+**For additional support, create an issue on GitHub or check the troubleshooting section.** 
