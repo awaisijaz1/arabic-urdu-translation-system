@@ -237,6 +237,46 @@ async def update_llm_config(request: Request):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update LLM config: {str(e)}")
 
+@app.get("/translate/llm/config/providers")
+async def get_api_providers():
+    """Get all available API providers"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{TRANSLATION_SERVICE_URL}/translate/llm/config/providers")
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get providers: {str(e)}")
+
+@app.get("/translate/llm/config/models")
+async def get_models():
+    """Get all available models"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{TRANSLATION_SERVICE_URL}/translate/llm/config/models")
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get models: {str(e)}")
+
+@app.get("/translate/llm/config/prompts")
+async def get_system_prompts():
+    """Get all available system prompts"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{TRANSLATION_SERVICE_URL}/translate/llm/config/prompts")
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get prompts: {str(e)}")
+
+@app.get("/translate/llm/config/logs")
+async def get_config_logs(limit: int = 50):
+    """Get configuration change logs"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{TRANSLATION_SERVICE_URL}/translate/llm/config/logs?limit={limit}")
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get logs: {str(e)}")
+
 @app.post("/translate/llm/{job_id}/approve")
 async def approve_llm_translation(job_id: str, request: Request):
     """Approve LLM translation job and move to ground truth"""

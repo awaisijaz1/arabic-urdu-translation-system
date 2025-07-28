@@ -1,13 +1,20 @@
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Optional
 import os
 import uuid
+import json
+import logging
 
 from models import TranslationReviewRequest, ReviewResponse, ReviewStatus
 from translator import ReviewEngine
 from langchain_translator import LangChainTranslator
+from pydantic import BaseModel
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Translation Review Service", version="1.0.0")
 
@@ -36,6 +43,173 @@ langchain_translator = LangChainTranslator()
 
 # In-memory storage for LLM translation jobs (now managed by LangChain translator)
 llm_jobs = langchain_translator.translation_jobs
+
+# LLM Configuration Models
+class APIProvider(BaseModel):
+    name: str
+    api_key: str
+    base_url: Optional[str] = None
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
+
+class LLMModel(BaseModel):
+    provider: str
+    model_id: str
+    name: str
+    description: str
+    max_tokens: int
+    temperature: float
+    is_active: bool = True
+    created_at: datetime
+    updated_at: datetime
+
+class SystemPrompt(BaseModel):
+    name: str
+    content: str
+    description: str
+    is_default: bool = False
+    created_at: datetime
+    updated_at: datetime
+
+class LLMConfigLog(BaseModel):
+    action: str
+    user: str
+    details: Dict
+    timestamp: datetime
+
+# In-memory storage for configuration (in production, use a database)
+llm_config = {
+    "api_providers": {},
+    "models": {},
+    "system_prompts": {},
+    "current_config": {
+        "provider": "anthropic",
+        "model": "claude-3-sonnet-20240229",
+        "system_prompt": "You are an expert Arabic to Urdu translator. Provide accurate, natural translations that maintain the original meaning and tone.",
+        "temperature": 0.1,
+        "max_tokens": 1000
+    },
+    "logs": []
+}
+
+def initialize_default_config():
+    """Initialize default LLM configuration"""
+    now = datetime.utcnow()
+    
+    # Default API providers
+    if "anthropic" not in llm_config["api_providers"]:
+        llm_config["api_providers"]["anthropic"] = APIProvider(
+            name="Anthropic",
+            api_key=os.getenv("ANTHROPIC_API_KEY", ""),
+            is_active=bool(os.getenv("ANTHROPIC_API_KEY")),
+            created_at=now,
+            updated_at=now
+        )
+    
+    if "openai" not in llm_config["api_providers"]:
+        llm_config["api_providers"]["openai"] = APIProvider(
+            name="OpenAI",
+            api_key=os.getenv("OPENAI_API_KEY", ""),
+            is_active=bool(os.getenv("OPENAI_API_KEY")),
+            created_at=now,
+            updated_at=now
+        )
+    
+    # Default models
+    default_models = [
+        {
+            "provider": "anthropic",
+            "model_id": "claude-3-sonnet-20240229",
+            "name": "Claude 3 Sonnet",
+            "description": "Balanced performance and speed",
+            "max_tokens": 1000,
+            "temperature": 0.1
+        },
+        {
+            "provider": "anthropic",
+            "model_id": "claude-3-opus-20240229",
+            "name": "Claude 3 Opus",
+            "description": "Highest performance, slower speed",
+            "max_tokens": 1000,
+            "temperature": 0.1
+        },
+        {
+            "provider": "anthropic",
+            "model_id": "claude-3-haiku-20240307",
+            "name": "Claude 3 Haiku",
+            "description": "Fastest speed, good performance",
+            "max_tokens": 1000,
+            "temperature": 0.1
+        },
+        {
+            "provider": "openai",
+            "model_id": "gpt-4",
+            "name": "GPT-4",
+            "description": "OpenAI's most capable model",
+            "max_tokens": 1000,
+            "temperature": 0.1
+        },
+        {
+            "provider": "openai",
+            "model_id": "gpt-3.5-turbo",
+            "name": "GPT-3.5 Turbo",
+            "description": "Fast and cost-effective",
+            "max_tokens": 1000,
+            "temperature": 0.1
+        }
+    ]
+    
+    for model_data in default_models:
+        model_key = f"{model_data['provider']}_{model_data['model_id']}"
+        if model_key not in llm_config["models"]:
+            llm_config["models"][model_key] = LLMModel(
+                **model_data,
+                created_at=now,
+                updated_at=now
+            )
+    
+    # Default system prompts
+    default_prompts = [
+        {
+            "name": "Standard Translation",
+            "content": "You are an expert Arabic to Urdu translator. Provide accurate, natural translations that maintain the original meaning and tone.",
+            "description": "Standard translation prompt for general use",
+            "is_default": True
+        },
+        {
+            "name": "News Translation",
+            "content": "You are an expert Arabic to Urdu translator specializing in news and media content. Translate with journalistic accuracy and clarity.",
+            "description": "Optimized for news and media content"
+        },
+        {
+            "name": "Technical Translation",
+            "content": "You are an expert Arabic to Urdu translator specializing in technical and academic content. Maintain technical accuracy and terminology.",
+            "description": "Optimized for technical and academic content"
+        }
+    ]
+    
+    for prompt_data in default_prompts:
+        if prompt_data["name"] not in llm_config["system_prompts"]:
+            llm_config["system_prompts"][prompt_data["name"]] = SystemPrompt(
+                **prompt_data,
+                created_at=now,
+                updated_at=now
+            )
+
+def log_config_change(action: str, user: str, details: Dict):
+    """Log configuration changes"""
+    log_entry = LLMConfigLog(
+        action=action,
+        user=user,
+        details=details,
+        timestamp=datetime.utcnow()
+    )
+    llm_config["logs"].append(log_entry)
+    logger.info(f"LLM Config Change: {action} by {user} - {details}")
+
+# Initialize default configuration
+initialize_default_config()
 
 @app.get("/health")
 async def health_check():
@@ -231,9 +405,46 @@ async def get_llm_config():
     """Get current LLM configuration"""
     try:
         return {
-            "model": langchain_translator.model,
-            "system_prompt": langchain_translator.system_prompt,
-            "api_key_configured": bool(os.getenv("ANTHROPIC_API_KEY")),
+            "current_config": llm_config["current_config"],
+            "api_providers": {
+                k: {
+                    "name": v.name,
+                    "is_active": v.is_active,
+                    "created_at": v.created_at.isoformat(),
+                    "updated_at": v.updated_at.isoformat()
+                } for k, v in llm_config["api_providers"].items()
+            },
+            "models": {
+                k: {
+                    "provider": v.provider,
+                    "model_id": v.model_id,
+                    "name": v.name,
+                    "description": v.description,
+                    "max_tokens": v.max_tokens,
+                    "temperature": v.temperature,
+                    "is_active": v.is_active,
+                    "created_at": v.created_at.isoformat(),
+                    "updated_at": v.updated_at.isoformat()
+                } for k, v in llm_config["models"].items()
+            },
+            "system_prompts": {
+                k: {
+                    "name": v.name,
+                    "content": v.content,
+                    "description": v.description,
+                    "is_default": v.is_default,
+                    "created_at": v.created_at.isoformat(),
+                    "updated_at": v.updated_at.isoformat()
+                } for k, v in llm_config["system_prompts"].items()
+            },
+            "logs": [
+                {
+                    "action": log.action,
+                    "user": log.user,
+                    "details": log.details,
+                    "timestamp": log.timestamp.isoformat()
+                } for log in llm_config["logs"][-10:]  # Last 10 logs
+            ],
             "timestamp": datetime.utcnow().isoformat()
         }
     except Exception as e:
@@ -243,21 +454,187 @@ async def get_llm_config():
 async def update_llm_config(request: Dict):
     """Update LLM configuration"""
     try:
-        if "system_prompt" in request:
-            langchain_translator.system_prompt = request["system_prompt"]
+        user = request.get("user", "admin")
+        changes = []
         
-        if "model" in request:
-            langchain_translator.model = request["model"]
+        # Update current configuration
+        if "current_config" in request:
+            current_config = request["current_config"]
+            old_config = llm_config["current_config"].copy()
+            
+            for key, value in current_config.items():
+                if key in llm_config["current_config"] and llm_config["current_config"][key] != value:
+                    llm_config["current_config"][key] = value
+                    changes.append(f"Updated {key}: {old_config[key]} -> {value}")
+        
+        # Update API providers
+        if "api_providers" in request:
+            for provider_id, provider_data in request["api_providers"].items():
+                if provider_id in llm_config["api_providers"]:
+                    old_provider = llm_config["api_providers"][provider_id]
+                    llm_config["api_providers"][provider_id].api_key = provider_data.get("api_key", old_provider.api_key)
+                    llm_config["api_providers"][provider_id].is_active = provider_data.get("is_active", old_provider.is_active)
+                    llm_config["api_providers"][provider_id].updated_at = datetime.utcnow()
+                    changes.append(f"Updated API provider: {provider_id}")
+        
+        # Add new API providers
+        if "new_api_providers" in request:
+            for provider_data in request["new_api_providers"]:
+                provider_id = provider_data["id"]
+                if provider_id not in llm_config["api_providers"]:
+                    llm_config["api_providers"][provider_id] = APIProvider(
+                        name=provider_data["name"],
+                        api_key=provider_data["api_key"],
+                        base_url=provider_data.get("base_url"),
+                        is_active=provider_data.get("is_active", True),
+                        created_at=datetime.utcnow(),
+                        updated_at=datetime.utcnow()
+                    )
+                    changes.append(f"Added API provider: {provider_id}")
+        
+        # Update models
+        if "models" in request:
+            for model_key, model_data in request["models"].items():
+                if model_key in llm_config["models"]:
+                    old_model = llm_config["models"][model_key]
+                    for key, value in model_data.items():
+                        if hasattr(old_model, key) and getattr(old_model, key) != value:
+                            setattr(llm_config["models"][model_key], key, value)
+                    llm_config["models"][model_key].updated_at = datetime.utcnow()
+                    changes.append(f"Updated model: {model_key}")
+        
+        # Add new models
+        if "new_models" in request:
+            for model_data in request["new_models"]:
+                model_key = f"{model_data['provider']}_{model_data['model_id']}"
+                if model_key not in llm_config["models"]:
+                    llm_config["models"][model_key] = LLMModel(
+                        provider=model_data["provider"],
+                        model_id=model_data["model_id"],
+                        name=model_data["name"],
+                        description=model_data["description"],
+                        max_tokens=model_data["max_tokens"],
+                        temperature=model_data["temperature"],
+                        is_active=model_data.get("is_active", True),
+                        created_at=datetime.utcnow(),
+                        updated_at=datetime.utcnow()
+                    )
+                    changes.append(f"Added model: {model_key}")
+        
+        # Update system prompts
+        if "system_prompts" in request:
+            for prompt_name, prompt_data in request["system_prompts"].items():
+                if prompt_name in llm_config["system_prompts"]:
+                    old_prompt = llm_config["system_prompts"][prompt_name]
+                    llm_config["system_prompts"][prompt_name].content = prompt_data.get("content", old_prompt.content)
+                    llm_config["system_prompts"][prompt_name].description = prompt_data.get("description", old_prompt.description)
+                    llm_config["system_prompts"][prompt_name].is_default = prompt_data.get("is_default", old_prompt.is_default)
+                    llm_config["system_prompts"][prompt_name].updated_at = datetime.utcnow()
+                    changes.append(f"Updated system prompt: {prompt_name}")
+        
+        # Add new system prompts
+        if "new_system_prompts" in request:
+            for prompt_data in request["new_system_prompts"]:
+                prompt_name = prompt_data["name"]
+                if prompt_name not in llm_config["system_prompts"]:
+                    llm_config["system_prompts"][prompt_name] = SystemPrompt(
+                        name=prompt_data["name"],
+                        content=prompt_data["content"],
+                        description=prompt_data["description"],
+                        is_default=prompt_data.get("is_default", False),
+                        created_at=datetime.utcnow(),
+                        updated_at=datetime.utcnow()
+                    )
+                    changes.append(f"Added system prompt: {prompt_name}")
+        
+        # Log changes if any
+        if changes:
+            log_config_change("configuration_updated", user, {"changes": changes})
         
         return {
             "message": "Configuration updated successfully",
-            "current_config": {
-                "model": langchain_translator.model,
-                "system_prompt": langchain_translator.system_prompt
-            }
+            "changes": changes,
+            "current_config": llm_config["current_config"]
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to update config: {str(e)}")
+
+@app.get("/translate/llm/config/providers")
+async def get_api_providers():
+    """Get all available API providers"""
+    try:
+        return {
+            "providers": {
+                k: {
+                    "name": v.name,
+                    "is_active": v.is_active,
+                    "has_api_key": bool(v.api_key),
+                    "created_at": v.created_at.isoformat(),
+                    "updated_at": v.updated_at.isoformat()
+                } for k, v in llm_config["api_providers"].items()
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get providers: {str(e)}")
+
+@app.get("/translate/llm/config/models")
+async def get_models():
+    """Get all available models"""
+    try:
+        return {
+            "models": {
+                k: {
+                    "provider": v.provider,
+                    "model_id": v.model_id,
+                    "name": v.name,
+                    "description": v.description,
+                    "max_tokens": v.max_tokens,
+                    "temperature": v.temperature,
+                    "is_active": v.is_active,
+                    "created_at": v.created_at.isoformat(),
+                    "updated_at": v.updated_at.isoformat()
+                } for k, v in llm_config["models"].items()
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get models: {str(e)}")
+
+@app.get("/translate/llm/config/prompts")
+async def get_system_prompts():
+    """Get all available system prompts"""
+    try:
+        return {
+            "prompts": {
+                k: {
+                    "name": v.name,
+                    "content": v.content,
+                    "description": v.description,
+                    "is_default": v.is_default,
+                    "created_at": v.created_at.isoformat(),
+                    "updated_at": v.updated_at.isoformat()
+                } for k, v in llm_config["system_prompts"].items()
+            }
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get prompts: {str(e)}")
+
+@app.get("/translate/llm/config/logs")
+async def get_config_logs(limit: int = 50):
+    """Get configuration change logs"""
+    try:
+        logs = llm_config["logs"][-limit:] if limit > 0 else llm_config["logs"]
+        return {
+            "logs": [
+                {
+                    "action": log.action,
+                    "user": log.user,
+                    "details": log.details,
+                    "timestamp": log.timestamp.isoformat()
+                } for log in logs
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get logs: {str(e)}")
 
 @app.post("/translate/llm/{job_id}/approve")
 async def approve_llm_translation(job_id: str, request: Dict):

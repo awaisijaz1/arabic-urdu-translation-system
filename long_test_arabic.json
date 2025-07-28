@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "title": "Long Arabic to Urdu Translation Test",
+    "language_pair": "ar-ur",
+    "description": "Comprehensive test file with various Arabic content types",
+    "segments_count": 15,
+    "created_at": "2025-07-21T12:20:00Z"
+  },
+  "segments": [
+    {
+      "segment_id": "1",
+      "start_time": "00:00:01.000",
+      "end_time": "00:00:04.000",
+      "original_text": "مرحبا بكم في النشرة الإخبارية المسائية"
+    },
+    {
+      "segment_id": "2",
+      "start_time": "00:00:04.500",
+      "end_time": "00:00:07.500",
+      "original_text": "نبدأ مع آخر الأخبار السياسية من العاصمة"
+    },
+    {
+      "segment_id": "3",
+      "start_time": "00:00:08.000",
+      "end_time": "00:00:11.000",
+      "original_text": "اجتمع مجلس الوزراء اليوم لمناقشة الميزانية الجديدة"
+    },
+    {
+      "segment_id": "4",
+      "start_time": "00:00:11.500",
+      "end_time": "00:00:14.500",
+      "original_text": "وأعلن رئيس الوزراء عن خطة اقتصادية شاملة"
+    },
+    {
+      "segment_id": "5",
+      "start_time": "00:00:15.000",
+      "end_time": "00:00:18.000",
+      "original_text": "في مجال الرياضة، فاز الفريق المحلي بالدوري"
+    },
+    {
+      "segment_id": "6",
+      "start_time": "00:00:18.500",
+      "end_time": "00:00:21.500",
+      "original_text": "وسجل اللاعب النجم هدفين في المباراة النهائية"
+    },
+    {
+      "segment_id": "7",
+      "start_time": "00:00:22.000",
+      "end_time": "00:00:25.000",
+      "original_text": "أما في مجال الطقس، فمن المتوقع أن يكون اليوم مشمساً"
+    },
+    {
+      "segment_id": "8",
+      "start_time": "00:00:25.500",
+      "end_time": "00:00:28.500",
+      "original_text": "مع درجات حرارة تتراوح بين 25 و 30 درجة مئوية"
+    },
+    {
+      "segment_id": "9",
+      "start_time": "00:00:29.000",
+      "end_time": "00:00:32.000",
+      "original_text": "وفي الأخبار الدولية، عقد مؤتمر قمة في أوروبا"
+    },
+    {
+      "segment_id": "10",
+      "start_time": "00:00:32.500",
+      "end_time": "00:00:35.500",
+      "original_text": "للمناقشة حول التغيرات المناخية والطاقة المتجددة"
+    },
+    {
+      "segment_id": "11",
+      "start_time": "00:00:36.000",
+      "end_time": "00:00:39.000",
+      "original_text": "وأكد المشاركون على أهمية التعاون الدولي"
+    },
+    {
+      "segment_id": "12",
+      "start_time": "00:00:39.500",
+      "end_time": "00:00:42.500",
+      "original_text": "في مجال التكنولوجيا، أعلنت شركة عالمية عن منتج جديد"
+    },
+    {
+      "segment_id": "13",
+      "start_time": "00:00:43.000",
+      "end_time": "00:00:46.000",
+      "original_text": "يستخدم الذكاء الاصطناعي في تحسين الخدمات الصحية"
+    },
+    {
+      "segment_id": "14",
+      "start_time": "00:00:46.500",
+      "end_time": "00:00:49.500",
+      "original_text": "وأخيراً، نذكركم بموعد البرنامج القادم غداً"
+    },
+    {
+      "segment_id": "15",
+      "start_time": "00:00:50.000",
+      "end_time": "00:00:53.000",
+      "original_text": "شكراً لكم على المشاهدة وإلى اللقاء في النشرة القادمة"
+    }
+  ]
+} 
