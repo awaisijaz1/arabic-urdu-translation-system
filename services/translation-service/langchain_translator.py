@@ -1,6 +1,7 @@
 import os
 import asyncio
 import time
+import json
 from datetime import datetime
 from typing import Dict, List, Optional, Tuple
 from pydantic import BaseModel
@@ -29,7 +30,7 @@ class TranslationJob(BaseModel):
     job_id: str
     file_id: str
     segments: List[TranslationSegment]
-    status: str = "pending"  # pending, in_progress, completed, failed
+    status: str = "pending"  # pending, in_progress, completed, failed, approved
     created_at: datetime
     completed_at: Optional[datetime] = None
     total_segments: int
@@ -65,6 +66,88 @@ class TranslationOutputParser(BaseOutputParser):
         }
 
 
+class PersistentJobStorage:
+    """Persistent storage for translation jobs using JSON files"""
+    
+    def __init__(self, storage_dir: str = "/app/data"):
+        self.storage_dir = storage_dir
+        self.jobs_file = os.path.join(storage_dir, "translation_jobs.json")
+        os.makedirs(storage_dir, exist_ok=True)
+    
+    def save_jobs(self, jobs: Dict[str, TranslationJob]):
+        """Save jobs to JSON file"""
+        try:
+            # Convert jobs to serializable format
+            jobs_data = {}
+            for job_id, job in jobs.items():
+                jobs_data[job_id] = {
+                    "job_id": job.job_id,
+                    "file_id": job.file_id,
+                    "segments": [
+                        {
+                            "segment_id": s.segment_id,
+                            "original_text": s.original_text,
+                            "translated_text": s.translated_text,
+                            "llm_translation": s.llm_translation,
+                            "confidence_score": s.confidence_score,
+                            "quality_metrics": s.quality_metrics,
+                            "translation_time": s.translation_time
+                        } for s in job.segments
+                    ],
+                    "status": job.status,
+                    "created_at": job.created_at.isoformat(),
+                    "completed_at": job.completed_at.isoformat() if job.completed_at else None,
+                    "total_segments": job.total_segments,
+                    "completed_segments": job.completed_segments,
+                    "average_confidence": job.average_confidence,
+                    "average_quality_score": job.average_quality_score
+                }
+            
+            with open(self.jobs_file, 'w', encoding='utf-8') as f:
+                json.dump(jobs_data, f, ensure_ascii=False, indent=2)
+            
+            print(f"Saved {len(jobs)} translation jobs to {self.jobs_file}")
+        except Exception as e:
+            print(f"Error saving jobs: {e}")
+    
+    def load_jobs(self) -> Dict[str, TranslationJob]:
+        """Load jobs from JSON file"""
+        jobs = {}
+        try:
+            if os.path.exists(self.jobs_file):
+                with open(self.jobs_file, 'r', encoding='utf-8') as f:
+                    jobs_data = json.load(f)
+                
+                for job_id, job_data in jobs_data.items():
+                    # Convert segments back to TranslationSegment objects
+                    segments = []
+                    for seg_data in job_data["segments"]:
+                        segments.append(TranslationSegment(**seg_data))
+                    
+                    # Create TranslationJob object
+                    job = TranslationJob(
+                        job_id=job_data["job_id"],
+                        file_id=job_data["file_id"],
+                        segments=segments,
+                        status=job_data["status"],
+                        created_at=datetime.fromisoformat(job_data["created_at"]),
+                        completed_at=datetime.fromisoformat(job_data["completed_at"]) if job_data["completed_at"] else None,
+                        total_segments=job_data["total_segments"],
+                        completed_segments=job_data["completed_segments"],
+                        average_confidence=job_data["average_confidence"],
+                        average_quality_score=job_data["average_quality_score"]
+                    )
+                    jobs[job_id] = job
+                
+                print(f"Loaded {len(jobs)} translation jobs from {self.jobs_file}")
+            else:
+                print(f"No existing jobs file found at {self.jobs_file}")
+        except Exception as e:
+            print(f"Error loading jobs: {e}")
+        
+        return jobs
+
+
 class LangChainTranslator:
     """Advanced LLM translator using LangChain for Arabic to Urdu translation with intelligent chunking"""
     
@@ -73,6 +156,12 @@ class LangChainTranslator:
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY environment variable is required")
+        
+        # Initialize persistent storage
+        self.storage = PersistentJobStorage()
+        
+        # Load existing jobs from storage
+        self.translation_jobs: Dict[str, TranslationJob] = self.storage.load_jobs()
         
         # Initialize LangChain components
         self.model = ChatAnthropic(
@@ -97,9 +186,6 @@ class LangChainTranslator:
         
         # Create the translation chain
         self.translation_chain = self.system_prompt | self.model | TranslationOutputParser()
-        
-        # Translation jobs storage
-        self.translation_jobs: Dict[str, TranslationJob] = {}
         
         # Rate limiting configuration
         self.max_requests_per_minute = 5
@@ -266,102 +352,101 @@ Remember: Your goal is to produce translations that are not only accurate but al
         return metrics
     
     async def translate_file(self, file_id: str, segments: List[Dict], use_existing_translations: bool = False) -> TranslationJob:
-        """Translate an entire file with intelligent chunking and rate limiting"""
-        
-        job_id = f"langchain_job_{file_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        """Translate a file using LLM with intelligent chunking"""
+        job_id = f"llm_{file_id}_{int(time.time())}"
         
         # Create translation segments
         translation_segments = []
-        for segment_data in segments:
-            segment = TranslationSegment(
-                segment_id=segment_data["segment_id"],
-                original_text=segment_data["original_text"]
-            )
-            
-            # If using existing translations, set the translated_text
-            if use_existing_translations and "translated_text" in segment_data:
-                segment.translated_text = segment_data["translated_text"]
-                segment.llm_translation = segment_data["translated_text"]  # Use existing as LLM translation
-                segment.confidence_score = 1.0  # High confidence for existing translations
-                segment.quality_metrics = {"overall_quality_score": 0.9}  # Good quality for existing
-                segment.translation_time = 0.0  # No translation time for existing
-            
-            translation_segments.append(segment)
+        for i, segment in enumerate(segments):
+            segment_id = segment.get("segment_id", f"seg_{i+1}")
+            translation_segments.append(TranslationSegment(
+                segment_id=segment_id,
+                original_text=segment["original_text"],
+                translated_text=segment.get("translated_text"),
+                llm_translation=None,
+                confidence_score=None,
+                quality_metrics=None,
+                translation_time=None
+            ))
         
         # Create translation job
         job = TranslationJob(
             job_id=job_id,
             file_id=file_id,
             segments=translation_segments,
-            total_segments=len(segments),
-            created_at=datetime.now()
+            status="pending",
+            created_at=datetime.utcnow(),
+            total_segments=len(translation_segments),
+            completed_segments=0
         )
         
         # Store job
         self.translation_jobs[job_id] = job
-        job.status = "in_progress"
+        self.storage.save_jobs(self.translation_jobs)
         
-        try:
-            # Check if we're using existing translations
-            if use_existing_translations:
-                # Mark all segments as completed since they already have translations
-                job.completed_segments = len(job.segments)
-                job.status = "completed"
-                job.completed_at = datetime.now()
-                
-                # Calculate metrics for existing translations
-                completed_segments = [s for s in job.segments if s.llm_translation is not None]
-                if completed_segments:
-                    job.average_confidence = sum(s.confidence_score or 0 for s in completed_segments) / len(completed_segments)
-                    job.average_quality_score = sum(s.quality_metrics.get("overall_quality_score", 0) for s in completed_segments) / len(completed_segments)
-                
-                print(f"Using existing translations for {len(job.segments)} segments")
-            else:
-                # Process segments in optimal chunks
-                await self._process_chunks(job)
-                
-                # Update final job metrics
-                job.status = "completed"
-                job.completed_at = datetime.now()
-                
-                if job.completed_segments > 0:
-                    job.average_confidence = sum(s.confidence_score or 0 for s in job.segments) / job.completed_segments
-                    job.average_quality_score = sum(s.quality_metrics.get("overall_quality_score", 0) for s in job.segments) / job.completed_segments
+        # If using existing translations, populate segments and mark as completed
+        if use_existing_translations:
+            for segment in job.segments:
+                if segment.translated_text:
+                    segment.llm_translation = segment.translated_text
+                    segment.confidence_score = 1.0  # High confidence for existing translations
+                    segment.quality_metrics = {"existing_translation": True}
+                    segment.translation_time = 0.0
             
+            job.status = "completed"
+            job.completed_segments = len(job.segments)
+            job.completed_at = datetime.utcnow()
+            job.average_confidence = 1.0
+            job.average_quality_score = 1.0
+            
+            # Save updated job
+            self.storage.save_jobs(self.translation_jobs)
             return job
+        
+        # Start background processing
+        asyncio.create_task(self._process_chunks(job))
+        
+        return job
+
+    async def _process_chunks(self, job: TranslationJob):
+        """Process translation chunks with intelligent batching"""
+        try:
+            job.status = "in_progress"
+            self.storage.save_jobs(self.translation_jobs)
+            
+            # Create optimal chunks
+            chunks = self._create_chunks(job.segments, chunk_size=3)
+            
+            print(f"Processing {len(chunks)} chunks for job {job.job_id}")
+            
+            # Process each chunk
+            for chunk_index, chunk in enumerate(chunks):
+                await self._process_single_chunk(chunk, job, chunk_index)
+                
+                # Update progress and save
+                job.completed_segments = sum(1 for s in job.segments if s.llm_translation is not None)
+                self.storage.save_jobs(self.translation_jobs)
+                
+                # Rate limiting
+                await self._check_rate_limit()
+            
+            # Calculate final metrics
+            completed_segments = [s for s in job.segments if s.llm_translation is not None]
+            if completed_segments:
+                job.average_confidence = sum(s.confidence_score or 0 for s in completed_segments) / len(completed_segments)
+                job.average_quality_score = sum(s.quality_metrics.get("overall_quality_score", 0) for s in completed_segments) / len(completed_segments)
+            
+            job.status = "completed"
+            job.completed_at = datetime.utcnow()
+            self.storage.save_jobs(self.translation_jobs)
+            
+            print(f"Job {job.job_id} completed successfully")
             
         except Exception as e:
             job.status = "failed"
-            raise Exception(f"File translation failed: {str(e)}")
-
-    async def _process_chunks(self, job: TranslationJob):
-        """Process segments in optimal chunks with rate limiting"""
-        total_segments = len(job.segments)
-        
-        # Create chunks of optimal size
-        chunks = self._create_chunks(job.segments, self.chunk_size)
-        
-        print(f"Processing {total_segments} segments in {len(chunks)} chunks of size {self.chunk_size}")
-        
-        for chunk_index, chunk in enumerate(chunks):
-            try:
-                print(f"Processing chunk {chunk_index + 1}/{len(chunks)} with {len(chunk)} segments")
-                
-                # Check rate limits before processing
-                await self._check_rate_limit()
-                
-                # Process the chunk
-                await self._process_single_chunk(chunk, job, chunk_index)
-                
-                # Update progress
-                job.completed_segments = sum(1 for s in job.segments if s.llm_translation is not None)
-                
-                print(f"Completed chunk {chunk_index + 1}: {job.completed_segments}/{total_segments} segments done")
-                
-            except Exception as e:
-                print(f"Error processing chunk {chunk_index + 1}: {str(e)}")
-                # Continue with next chunk instead of failing entire job
-                continue
+            self.storage.save_jobs(self.translation_jobs)
+            print(f"Job {job.job_id} failed: {str(e)}")
+            raise
 
     def _create_chunks(self, segments: List[TranslationSegment], chunk_size: int) -> List[List[TranslationSegment]]:
         """Create optimal chunks based on segment count and prompt size"""

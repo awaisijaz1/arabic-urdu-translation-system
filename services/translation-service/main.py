@@ -690,8 +690,9 @@ async def approve_llm_translation(job_id: str, request: Dict):
             if response.status_code != 200:
                 raise HTTPException(status_code=500, detail=f"Failed to save to ground truth: {response.text}")
         
-        # Mark job as approved
+        # Mark job as approved and save to persistent storage
         job.status = "approved"
+        langchain_translator.storage.save_jobs(langchain_translator.translation_jobs)
         
         return {
             "message": "Translation job approved and moved to ground truth",
