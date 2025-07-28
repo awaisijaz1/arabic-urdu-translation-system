@@ -7,7 +7,7 @@
         "segment_id": "test1",
         "original_text": "مرحبا",
         "translated_text": null,
-        "llm_translation": "آداب",
+        "llm_translation": "خوش آمدید",
         "confidence_score": 0.9600000000000001,
         "quality_metrics": {
           "length_ratio": 0.8,
@@ -20,15 +20,85 @@
           "has_arabic_numerals": false,
           "overall_quality_score": 0.8999999999999999
         },
-        "translation_time": 3.315323
+        "translation_time": 1753710237.933313
       }
     ],
-    "status": "completed",
+    "status": "approved",
     "created_at": "2025-07-28T13:39:27.767677",
     "completed_at": "2025-07-28T13:39:31.095296",
     "total_segments": 1,
     "completed_segments": 1,
     "average_confidence": 0.9600000000000001,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753710315": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753710315",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "خبروں میں خوش آمدید",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.35,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 27,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 1753710352.704777
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "یہ مشرق وسطی سے ایک خبری رپورٹ ہے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.03125,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 8,
+          "character_count": 33,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.49831566666666666
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "آپ کی توجہ کا شکریہ",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.4736842105263157,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 28,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 1753710434.035816
+      }
+    ],
+    "status": "approved",
+    "created_at": "2025-07-28T13:45:15.240695",
+    "completed_at": "2025-07-28T13:45:16.752365",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": 1.0,
     "average_quality_score": 0.8999999999999999
   }
 }

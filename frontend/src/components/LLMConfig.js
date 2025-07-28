@@ -29,6 +29,12 @@ const LLMConfig = () => {
   const [showAddProvider, setShowAddProvider] = useState(false);
   const [showAddModel, setShowAddModel] = useState(false);
   const [showAddPrompt, setShowAddPrompt] = useState(false);
+  const [showEditProvider, setShowEditProvider] = useState(false);
+  const [showEditModel, setShowEditModel] = useState(false);
+  const [showEditPrompt, setShowEditPrompt] = useState(false);
+  const [editingProvider, setEditingProvider] = useState(null);
+  const [editingModel, setEditingModel] = useState(null);
+  const [editingPrompt, setEditingPrompt] = useState(null);
   
   // Form states
   const [currentConfig, setCurrentConfig] = useState({
@@ -95,6 +101,12 @@ const LLMConfig = () => {
       onSuccess: () => {
         toast.success('LLM configuration updated successfully!');
         setIsEditing(false);
+        setShowAddProvider(false);
+        setShowAddModel(false);
+        setShowAddPrompt(false);
+        setShowEditProvider(false);
+        setShowEditModel(false);
+        setShowEditPrompt(false);
         queryClient.invalidateQueries(['llmConfig', 'llmProviders', 'llmModels', 'llmPrompts', 'llmLogs']);
       },
       onError: (error) => {
@@ -137,11 +149,15 @@ const LLMConfig = () => {
   };
 
   const handleAddProvider = () => {
+    if (!newProvider.id || !newProvider.name || !newProvider.api_key) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    
     updateConfigMutation.mutate({
       user: 'admin',
       new_api_providers: [newProvider]
     });
-    setShowAddProvider(false);
     setNewProvider({
       id: '',
       name: '',
@@ -151,12 +167,43 @@ const LLMConfig = () => {
     });
   };
 
+  const handleEditProvider = async (providerId, provider) => {
+    try {
+      // Fetch detailed provider information including API key
+      const response = await axios.get(`/translate/llm/config/providers/${providerId}`);
+      setEditingProvider(response.data);
+      setShowEditProvider(true);
+    } catch (error) {
+      toast.error('Failed to load provider details');
+      console.error('Error loading provider details:', error);
+    }
+  };
+
+  const handleUpdateProvider = () => {
+    if (!editingProvider) return;
+    
+    updateConfigMutation.mutate({
+      user: 'admin',
+      api_providers: {
+        [editingProvider.id]: {
+          api_key: editingProvider.api_key,
+          is_active: editingProvider.is_active
+        }
+      }
+    });
+    setEditingProvider(null);
+  };
+
   const handleAddModel = () => {
+    if (!newModel.provider || !newModel.model_id || !newModel.name) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    
     updateConfigMutation.mutate({
       user: 'admin',
       new_models: [newModel]
     });
-    setShowAddModel(false);
     setNewModel({
       provider: 'anthropic',
       model_id: '',
@@ -168,18 +215,66 @@ const LLMConfig = () => {
     });
   };
 
+  const handleEditModel = (modelKey, model) => {
+    setEditingModel({ key: modelKey, ...model });
+    setShowEditModel(true);
+  };
+
+  const handleUpdateModel = () => {
+    if (!editingModel) return;
+    
+    updateConfigMutation.mutate({
+      user: 'admin',
+      models: {
+        [editingModel.key]: {
+          name: editingModel.name,
+          description: editingModel.description,
+          max_tokens: editingModel.max_tokens,
+          temperature: editingModel.temperature,
+          is_active: editingModel.is_active
+        }
+      }
+    });
+    setEditingModel(null);
+  };
+
   const handleAddPrompt = () => {
+    if (!newPrompt.name || !newPrompt.content) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+    
     updateConfigMutation.mutate({
       user: 'admin',
       new_system_prompts: [newPrompt]
     });
-    setShowAddPrompt(false);
     setNewPrompt({
       name: '',
       content: '',
       description: '',
       is_default: false
     });
+  };
+
+  const handleEditPrompt = (promptName, prompt) => {
+    setEditingPrompt({ name: promptName, ...prompt });
+    setShowEditPrompt(true);
+  };
+
+  const handleUpdatePrompt = () => {
+    if (!editingPrompt) return;
+    
+    updateConfigMutation.mutate({
+      user: 'admin',
+      system_prompts: {
+        [editingPrompt.name]: {
+          content: editingPrompt.content,
+          description: editingPrompt.description,
+          is_default: editingPrompt.is_default
+        }
+      }
+    });
+    setEditingPrompt(null);
   };
 
   if (isLoading) {
@@ -445,6 +540,13 @@ const LLMConfig = () => {
                       }`}>
                         {provider.has_api_key ? 'API Key Set' : 'No API Key'}
                       </span>
+                      <button
+                        onClick={() => handleEditProvider(id, provider)}
+                        className="p-1 text-gray-500 hover:text-purple-600 transition-colors"
+                        title="Edit Provider"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -515,6 +617,72 @@ const LLMConfig = () => {
                 </div>
               </div>
             )}
+
+            {/* Edit Provider Modal */}
+            {showEditProvider && editingProvider && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-96">
+                  <h4 className="text-lg font-semibold mb-4">Edit API Provider</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Provider ID</label>
+                      <input
+                        type="text"
+                        value={editingProvider.id}
+                        onChange={(e) => setEditingProvider({...editingProvider, id: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="e.g., anthropic"
+                        disabled
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                      <input
+                        type="text"
+                        value={editingProvider.name}
+                        onChange={(e) => setEditingProvider({...editingProvider, name: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="e.g., Anthropic"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">API Key</label>
+                      <input
+                        type="password"
+                        value={editingProvider.api_key}
+                        onChange={(e) => setEditingProvider({...editingProvider, api_key: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="sk-..."
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Base URL (Optional)</label>
+                      <input
+                        type="text"
+                        value={editingProvider.base_url}
+                        onChange={(e) => setEditingProvider({...editingProvider, base_url: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="https://api.anthropic.com"
+                      />
+                    </div>
+                    <div className="flex space-x-3 mt-6">
+                      <button
+                        onClick={handleUpdateProvider}
+                        className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                      >
+                        Save Changes
+                      </button>
+                      <button
+                        onClick={() => setShowEditProvider(false)}
+                        className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -551,6 +719,13 @@ const LLMConfig = () => {
                       }`}>
                         {model.is_active ? 'Active' : 'Inactive'}
                       </span>
+                      <button
+                        onClick={() => handleEditModel(id, model)}
+                        className="p-1 text-gray-500 hover:text-purple-600 transition-colors"
+                        title="Edit Model"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                   <div className="mt-2 flex space-x-4 text-xs text-gray-500">
@@ -648,6 +823,103 @@ const LLMConfig = () => {
                 </div>
               </div>
             )}
+
+            {/* Edit Model Modal */}
+            {showEditModel && editingModel && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-96">
+                  <h4 className="text-lg font-semibold mb-4">Edit Model</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Provider</label>
+                      <select
+                        value={editingModel.provider}
+                        onChange={(e) => setEditingModel({...editingModel, provider: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                      >
+                        {providers?.providers && Object.entries(providers.providers).map(([id, provider]) => (
+                          <option key={id} value={id}>{provider.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Model ID</label>
+                      <input
+                        type="text"
+                        value={editingModel.model_id}
+                        onChange={(e) => setEditingModel({...editingModel, model_id: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="e.g., claude-3-sonnet-20240229"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                      <input
+                        type="text"
+                        value={editingModel.name}
+                        onChange={(e) => setEditingModel({...editingModel, name: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="e.g., Claude 3 Sonnet"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                      <input
+                        type="text"
+                        value={editingModel.description}
+                        onChange={(e) => setEditingModel({...editingModel, description: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="e.g., Balanced performance and speed"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Max Tokens</label>
+                        <input
+                          type="number"
+                          value={editingModel.max_tokens}
+                          onChange={(e) => setEditingModel({...editingModel, max_tokens: parseInt(e.target.value)})}
+                          className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Temperature</label>
+                        <input
+                          type="number"
+                          step="0.1"
+                          value={editingModel.temperature}
+                          onChange={(e) => setEditingModel({...editingModel, temperature: parseFloat(e.target.value)})}
+                          className="w-full p-2 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={editingModel.is_active}
+                        onChange={(e) => setEditingModel({...editingModel, is_active: e.target.checked})}
+                        className="mr-2"
+                      />
+                      <label className="text-sm text-gray-700">Active</label>
+                    </div>
+                  </div>
+                  <div className="flex space-x-3 mt-6">
+                    <button
+                      onClick={handleUpdateModel}
+                      className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      onClick={() => setShowEditModel(false)}
+                      className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -682,6 +954,13 @@ const LLMConfig = () => {
                           Default
                         </span>
                       )}
+                      <button
+                        onClick={() => handleEditPrompt(name, prompt)}
+                        className="p-1 text-gray-500 hover:text-purple-600 transition-colors"
+                        title="Edit Prompt"
+                      >
+                        <Edit className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -743,6 +1022,70 @@ const LLMConfig = () => {
                     </button>
                     <button
                       onClick={() => setShowAddPrompt(false)}
+                      className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Edit Prompt Modal */}
+            {showEditPrompt && editingPrompt && (
+              <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg p-6 w-96">
+                  <h4 className="text-lg font-semibold mb-4">Edit System Prompt</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                      <input
+                        type="text"
+                        value={editingPrompt.name}
+                        onChange={(e) => setEditingPrompt({...editingPrompt, name: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="e.g., Technical Translation"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                      <input
+                        type="text"
+                        value={editingPrompt.description}
+                        onChange={(e) => setEditingPrompt({...editingPrompt, description: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        placeholder="e.g., Optimized for technical content"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                      <textarea
+                        value={editingPrompt.content}
+                        onChange={(e) => setEditingPrompt({...editingPrompt, content: e.target.value})}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                        rows={4}
+                        placeholder="Enter the system prompt content..."
+                      />
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={editingPrompt.is_default}
+                        onChange={(e) => setEditingPrompt({...editingPrompt, is_default: e.target.checked})}
+                        className="mr-2"
+                      />
+                      <label className="text-sm text-gray-700">Set as default prompt</label>
+                    </div>
+                  </div>
+                  <div className="flex space-x-3 mt-6">
+                    <button
+                      onClick={handleUpdatePrompt}
+                      className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                    >
+                      Save Changes
+                    </button>
+                    <button
+                      onClick={() => setShowEditPrompt(false)}
                       className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
                     >
                       Cancel

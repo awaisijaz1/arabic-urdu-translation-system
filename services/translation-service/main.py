@@ -577,6 +577,28 @@ async def get_api_providers():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get providers: {str(e)}")
 
+@app.get("/translate/llm/config/providers/{provider_id}")
+async def get_provider_details(provider_id: str):
+    """Get detailed provider information including API key for editing"""
+    try:
+        if provider_id not in llm_config["api_providers"]:
+            raise HTTPException(status_code=404, detail="Provider not found")
+        
+        provider = llm_config["api_providers"][provider_id]
+        return {
+            "id": provider_id,
+            "name": provider.name,
+            "api_key": provider.api_key,
+            "base_url": provider.base_url,
+            "is_active": provider.is_active,
+            "created_at": provider.created_at.isoformat(),
+            "updated_at": provider.updated_at.isoformat()
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get provider details: {str(e)}")
+
 @app.get("/translate/llm/config/models")
 async def get_models():
     """Get all available models"""

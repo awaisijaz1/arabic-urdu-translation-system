@@ -247,6 +247,16 @@ async def get_api_providers():
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to get providers: {str(e)}")
 
+@app.get("/translate/llm/config/providers/{provider_id}")
+async def get_provider_details(provider_id: str):
+    """Get detailed provider information including API key for editing"""
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(f"{TRANSLATION_SERVICE_URL}/translate/llm/config/providers/{provider_id}")
+            return response.json()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get provider details: {str(e)}")
+
 @app.get("/translate/llm/config/models")
 async def get_models():
     """Get all available models"""
