@@ -1,0 +1,130 @@
+version: '3.8'
+
+services:
+  # API Gateway (Development)
+  api-gateway:
+    build: 
+      context: ./services/api-gateway
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    environment:
+      - INPUT_SERVICE_URL=http://input-service:8001
+      - TRANSLATION_SERVICE_URL=http://translation-service:8002
+      - EVALUATION_SERVICE_URL=http://evaluation-service:8003
+      - STORAGE_SERVICE_URL=http://storage-service:8004
+      - DEBUG=true
+    volumes:
+      - ./services/api-gateway:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - input-service
+      - translation-service
+      - evaluation-service
+      - storage-service
+    networks:
+      - translation-network
+
+  # Input Service (Development)
+  input-service:
+    build: 
+      context: ./services/input-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=sqlite:///./data/input.db
+      - UPLOAD_FOLDER=/app/uploads
+      - DEBUG=true
+    volumes:
+      - ./services/input-service:/app
+      - ./data:/app/data
+      - ./uploads:/app/uploads
+    command: uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+    networks:
+      - translation-network
+
+  # Translation Service (Development)
+  translation-service:
+    build: 
+      context: ./services/translation-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=sqlite:///./data/translation.db
+      - MODEL_PATH=/app/models
+      - DEBUG=true
+    volumes:
+      - ./services/translation-service:/app
+      - ./data:/app/data
+      - ./models:/app/models
+    command: uvicorn main:app --host 0.0.0.0 --port 8002 --reload
+    networks:
+      - translation-network
+
+  # Evaluation Service (Development)
+  evaluation-service:
+    build: 
+      context: ./services/evaluation-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8003:8003"
+    environment:
+      - DATABASE_URL=sqlite:///./data/evaluation.db
+      - JWT_SECRET=dev-secret-key-change-in-production
+      - DEBUG=true
+    volumes:
+      - ./services/evaluation-service:/app
+      - ./data:/app/data
+    command: uvicorn main:app --host 0.0.0.0 --port 8003 --reload
+    networks:
+      - translation-network
+
+  # Storage Service (Development)
+  storage-service:
+    build: 
+      context: ./services/storage-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=sqlite:///./data/storage.db
+      - EXPORT_FOLDER=/app/exports
+      - DEBUG=true
+    volumes:
+      - ./services/storage-service:/app
+      - ./data:/app/data
+      - ./exports:/app/exports
+    command: uvicorn main:app --host 0.0.0.0 --port 8004 --reload
+    networks:
+      - translation-network
+
+  # Frontend (Development)
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm start
+    depends_on:
+      - api-gateway
+    networks:
+      - translation-network
+
+networks:
+  translation-network:
+    driver: bridge
+
+volumes:
+  data:
+  uploads:
+  exports:
+  models: 

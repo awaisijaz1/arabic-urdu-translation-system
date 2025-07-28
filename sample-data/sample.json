@@ -1,0 +1,71 @@
+{
+  "metadata": {
+    "title": "Arabic-Urdu News Broadcast",
+    "language_pair": "ar-ur",
+    "duration": "35.5",
+    "segments_count": 10,
+    "created_at": "2024-01-15T10:30:00Z"
+  },
+  "segments": [
+    {
+      "start_time": "00:00:01.000",
+      "end_time": "00:00:04.000",
+      "original_text": "مرحبا بكم في الأخبار",
+      "translated_text": "خبروں میں خوش آمدید"
+    },
+    {
+      "start_time": "00:00:04.500",
+      "end_time": "00:00:07.500",
+      "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+      "translated_text": "یہ مشرق وسطی سے ایک خبری رپورٹ ہے"
+    },
+    {
+      "start_time": "00:00:08.000",
+      "end_time": "00:00:11.000",
+      "original_text": "نشاهد الآن آخر التطورات",
+      "translated_text": "اب ہم تازہ ترین پیش رفت دیکھ رہے ہیں"
+    },
+    {
+      "start_time": "00:00:11.500",
+      "end_time": "00:00:14.500",
+      "original_text": "في مجال السياسة والاقتصاد",
+      "translated_text": "سیاست اور معیشت کے میدان میں"
+    },
+    {
+      "start_time": "00:00:15.000",
+      "end_time": "00:00:18.000",
+      "original_text": "أخبار الطقس لهذا اليوم",
+      "translated_text": "آج کے موسم کی خبریں"
+    },
+    {
+      "start_time": "00:00:18.500",
+      "end_time": "00:00:21.500",
+      "original_text": "درجة الحرارة المتوقعة",
+      "translated_text": "متوقع درجہ حرارت"
+    },
+    {
+      "start_time": "00:00:22.000",
+      "end_time": "00:00:25.000",
+      "original_text": "مشمس اليوم مع بعض الغيوم",
+      "translated_text": "آج دھوپ ہے کچھ بادلوں کے ساتھ"
+    },
+    {
+      "start_time": "00:00:25.500",
+      "end_time": "00:00:28.500",
+      "original_text": "غدا ممطر في بعض المناطق",
+      "translated_text": "کل کچھ علاقوں میں بارش ہوگی"
+    },
+    {
+      "start_time": "00:00:29.000",
+      "end_time": "00:00:32.000",
+      "original_text": "شكرا لكم على المشاهدة",
+      "translated_text": "دیکھنے کے لیے آپ کا شکریہ"
+    },
+    {
+      "start_time": "00:00:32.500",
+      "end_time": "00:00:35.500",
+      "original_text": "إلى اللقاء في النشرة القادمة",
+      "translated_text": "اگلے نشریہ میں پھر ملیں گے"
+    }
+  ]
+} 
