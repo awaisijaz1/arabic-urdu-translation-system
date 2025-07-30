@@ -91,3 +91,7 @@ exports/
 # Test files
 test_*.py
 simple_test.py 
+# LLM Configuration files (contain API keys)
+data/llm_config.json
+temp_config.json
+temp_llm_config.json

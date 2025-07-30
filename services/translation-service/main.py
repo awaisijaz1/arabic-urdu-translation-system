@@ -30,19 +30,251 @@ app.add_middleware(
 # Configuration
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/translation.db")
 MODEL_PATH = os.getenv("MODEL_PATH", "./models")
+CONFIG_FILE = "/app/data/llm_config.json"
 
 # Ensure directories exist
 os.makedirs("./data", exist_ok=True)
 os.makedirs(MODEL_PATH, exist_ok=True)
 
-# Initialize review engine
-review_engine = ReviewEngine()
+def load_llm_config() -> Dict:
+    """Load LLM configuration from persistent storage"""
+    try:
+        if os.path.exists(CONFIG_FILE):
+            with open(CONFIG_FILE, 'r') as f:
+                config = json.load(f)
+                
+                # Convert string timestamps back to datetime objects and create Pydantic objects
+                for provider_id, provider in config.get("api_providers", {}).items():
+                    if isinstance(provider, dict):
+                        # Convert datetime strings back to datetime objects
+                        if isinstance(provider.get("created_at"), str):
+                            provider["created_at"] = datetime.fromisoformat(provider["created_at"])
+                        if isinstance(provider.get("updated_at"), str):
+                            provider["updated_at"] = datetime.fromisoformat(provider["updated_at"])
+                        # Convert to APIProvider object
+                        config["api_providers"][provider_id] = APIProvider(**provider)
+                
+                for model_id, model in config.get("models", {}).items():
+                    if isinstance(model, dict):
+                        # Convert datetime strings back to datetime objects
+                        if isinstance(model.get("created_at"), str):
+                            model["created_at"] = datetime.fromisoformat(model["created_at"])
+                        if isinstance(model.get("updated_at"), str):
+                            model["updated_at"] = datetime.fromisoformat(model["updated_at"])
+                        # Convert to LLMModel object
+                        config["models"][model_id] = LLMModel(**model)
+                
+                for prompt_name, prompt in config.get("system_prompts", {}).items():
+                    if isinstance(prompt, dict):
+                        # Convert datetime strings back to datetime objects
+                        if isinstance(prompt.get("created_at"), str):
+                            prompt["created_at"] = datetime.fromisoformat(prompt["created_at"])
+                        if isinstance(prompt.get("updated_at"), str):
+                            prompt["updated_at"] = datetime.fromisoformat(prompt["updated_at"])
+                        # Convert to SystemPrompt object
+                        config["system_prompts"][prompt_name] = SystemPrompt(**prompt)
+                
+                # Convert logs
+                logs = []
+                for log in config.get("logs", []):
+                    if isinstance(log, dict):
+                        # Convert datetime strings back to datetime objects
+                        if isinstance(log.get("timestamp"), str):
+                            log["timestamp"] = datetime.fromisoformat(log["timestamp"])
+                        # Convert to LLMConfigLog object
+                        logs.append(LLMConfigLog(**log))
+                config["logs"] = logs
+                
+                return config
+    except Exception as e:
+        logger.warning(f"Failed to load config from {CONFIG_FILE}: {e}")
+    
+    # Return default config if file doesn't exist or fails to load
+    return get_default_config()
 
-# Initialize LangChain translator
-langchain_translator = LangChainTranslator()
+def save_llm_config(config: Dict):
+    """Save LLM configuration to persistent storage"""
+    try:
+        # Create a serializable copy of the config
+        config_copy = {}
+        
+        # Copy current_config
+        if "current_config" in config:
+            config_copy["current_config"] = config["current_config"]
+        
+        # Copy api_providers
+        config_copy["api_providers"] = {}
+        for provider_id, provider in config.get("api_providers", {}).items():
+            if hasattr(provider, 'dict'):
+                provider_dict = provider.dict()
+                # Convert datetime objects to strings
+                for key, value in provider_dict.items():
+                    if isinstance(value, datetime):
+                        provider_dict[key] = value.isoformat()
+                config_copy["api_providers"][provider_id] = provider_dict
+            else:
+                config_copy["api_providers"][provider_id] = provider
+        
+        # Copy models
+        config_copy["models"] = {}
+        for model_id, model in config.get("models", {}).items():
+            if hasattr(model, 'dict'):
+                model_dict = model.dict()
+                # Convert datetime objects to strings
+                for key, value in model_dict.items():
+                    if isinstance(value, datetime):
+                        model_dict[key] = value.isoformat()
+                config_copy["models"][model_id] = model_dict
+            else:
+                config_copy["models"][model_id] = model
+        
+        # Copy system_prompts
+        config_copy["system_prompts"] = {}
+        for prompt_name, prompt in config.get("system_prompts", {}).items():
+            if hasattr(prompt, 'dict'):
+                prompt_dict = prompt.dict()
+                # Convert datetime objects to strings
+                for key, value in prompt_dict.items():
+                    if isinstance(value, datetime):
+                        prompt_dict[key] = value.isoformat()
+                config_copy["system_prompts"][prompt_name] = prompt_dict
+            else:
+                config_copy["system_prompts"][prompt_name] = prompt
+        
+        # Copy logs
+        config_copy["logs"] = []
+        for log in config.get("logs", []):
+            if hasattr(log, 'dict'):
+                log_dict = log.dict()
+                # Convert datetime objects to strings
+                for key, value in log_dict.items():
+                    if isinstance(value, datetime):
+                        log_dict[key] = value.isoformat()
+                config_copy["logs"].append(log_dict)
+            else:
+                config_copy["logs"].append(log)
+        
+        with open(CONFIG_FILE, 'w') as f:
+            json.dump(config_copy, f, indent=2)
+        logger.info(f"LLM configuration saved to {CONFIG_FILE}")
+    except Exception as e:
+        logger.error(f"Failed to save config to {CONFIG_FILE}: {e}")
 
-# In-memory storage for LLM translation jobs (now managed by LangChain translator)
-llm_jobs = langchain_translator.translation_jobs
+def get_default_config() -> Dict:
+    """Get default LLM configuration"""
+    now = datetime.utcnow()
+    
+    return {
+        "api_providers": {
+            "anthropic": APIProvider(
+                name="Anthropic",
+                api_key=os.getenv("ANTHROPIC_API_KEY", ""),
+                base_url=None,
+                is_active=True,
+                created_at=now,
+                updated_at=now
+            ),
+            "openai": APIProvider(
+                name="OpenAI",
+                api_key=os.getenv("OPENAI_API_KEY", ""),
+                base_url=None,
+                is_active=False,
+                created_at=now,
+                updated_at=now
+            )
+        },
+        "models": {
+            "anthropic_claude-3-sonnet-20240229": LLMModel(
+                provider="anthropic",
+                model_id="claude-3-sonnet-20240229",
+                name="Claude 3 Sonnet",
+                description="Balanced performance and speed",
+                max_tokens=1000,
+                temperature=0.1,
+                is_active=True,
+                created_at=now,
+                updated_at=now
+            ),
+            "anthropic_claude-3-opus-20240229": LLMModel(
+                provider="anthropic",
+                model_id="claude-3-opus-20240229",
+                name="Claude 3 Opus",
+                description="Highest performance, slower speed",
+                max_tokens=1000,
+                temperature=0.1,
+                is_active=True,
+                created_at=now,
+                updated_at=now
+            ),
+            "anthropic_claude-3-haiku-20240307": LLMModel(
+                provider="anthropic",
+                model_id="claude-3-haiku-20240307",
+                name="Claude 3 Haiku",
+                description="Fastest speed, good performance",
+                max_tokens=1000,
+                temperature=0.1,
+                is_active=True,
+                created_at=now,
+                updated_at=now
+            ),
+            "openai_gpt-4": LLMModel(
+                provider="openai",
+                model_id="gpt-4",
+                name="GPT-4",
+                description="OpenAI's most capable model",
+                max_tokens=1000,
+                temperature=0.1,
+                is_active=True,
+                created_at=now,
+                updated_at=now
+            ),
+            "openai_gpt-3.5-turbo": LLMModel(
+                provider="openai",
+                model_id="gpt-3.5-turbo",
+                name="GPT-3.5 Turbo",
+                description="Fast and cost-effective",
+                max_tokens=1000,
+                temperature=0.1,
+                is_active=True,
+                created_at=now,
+                updated_at=now
+            )
+        },
+        "system_prompts": {
+            "Standard Translation": SystemPrompt(
+                name="Standard Translation",
+                content="You are an expert Arabic to Urdu translator. Provide accurate, natural translations that maintain the original meaning and tone.",
+                description="Standard translation prompt for general use",
+                is_default=True,
+                created_at=now,
+                updated_at=now
+            ),
+            "News Translation": SystemPrompt(
+                name="News Translation",
+                content="You are an expert Arabic to Urdu translator specializing in news and media content. Translate with journalistic accuracy and clarity.",
+                description="Optimized for news and media content",
+                is_default=False,
+                created_at=now,
+                updated_at=now
+            ),
+            "Technical Translation": SystemPrompt(
+                name="Technical Translation",
+                content="You are an expert Arabic to Urdu translator specializing in technical and academic content. Maintain technical accuracy and terminology.",
+                description="Optimized for technical and academic content",
+                is_default=False,
+                created_at=now,
+                updated_at=now
+            )
+        },
+        "current_config": {
+            "provider": "anthropic",
+            "model": "claude-3-sonnet-20240229",
+            "system_prompt": "You are an expert Arabic to Urdu translator. Provide accurate, natural translations that maintain the original meaning and tone.",
+            "temperature": 0.1,
+            "max_tokens": 1000
+        },
+        "logs": []
+    }
 
 # LLM Configuration Models
 class APIProvider(BaseModel):
@@ -78,20 +310,17 @@ class LLMConfigLog(BaseModel):
     details: Dict
     timestamp: datetime
 
-# In-memory storage for configuration (in production, use a database)
-llm_config = {
-    "api_providers": {},
-    "models": {},
-    "system_prompts": {},
-    "current_config": {
-        "provider": "anthropic",
-        "model": "claude-3-sonnet-20240229",
-        "system_prompt": "You are an expert Arabic to Urdu translator. Provide accurate, natural translations that maintain the original meaning and tone.",
-        "temperature": 0.1,
-        "max_tokens": 1000
-    },
-    "logs": []
-}
+# Load LLM configuration from persistent storage
+llm_config = load_llm_config()
+
+# Initialize review engine
+review_engine = ReviewEngine()
+
+# Initialize LangChain translator
+langchain_translator = LangChainTranslator()
+
+# In-memory storage for LLM translation jobs (now managed by LangChain translator)
+llm_jobs = langchain_translator.translation_jobs
 
 def initialize_default_config():
     """Initialize default LLM configuration"""
@@ -383,8 +612,15 @@ async def update_llm_translation(job_id: str, request: Dict):
         # Find and update segment
         for segment in job.segments:
             if segment.segment_id == segment_id:
+                # Store original translation for comparison
+                original_translation = segment.llm_translation
                 segment.llm_translation = updated_translation
-                segment.translation_time = datetime.now().timestamp()
+                # Don't update translation_time for manual edits - keep original
+                
+                # Mark segment as edited if translation changed
+                if original_translation != updated_translation:
+                    segment.is_edited = True
+                    segment.edited_at = datetime.utcnow().isoformat()
                 
                 # Recalculate job metrics
                 if job.completed_segments > 0:
@@ -550,6 +786,15 @@ async def update_llm_config(request: Dict):
         # Log changes if any
         if changes:
             log_config_change("configuration_updated", user, {"changes": changes})
+            
+            # Save configuration to persistent storage
+            save_llm_config(llm_config)
+            
+            # Refresh the translator configuration if any changes were made
+            try:
+                langchain_translator.refresh_configuration()
+            except Exception as e:
+                logger.warning(f"Failed to refresh translator configuration: {e}")
         
         return {
             "message": "Configuration updated successfully",
@@ -683,6 +928,9 @@ async def approve_llm_translation(job_id: str, request: Dict):
         
         # Convert segments to ground truth format
         for segment in job.segments:
+            # Determine status based on whether segment was edited
+            segment_status = "edited" if getattr(segment, 'is_edited', False) else "approved"
+            
             ground_truth_segment = {
                 "segment_id": segment.segment_id,
                 "start_time": "00:00:00.000",  # Default timing for LLM translations
@@ -690,9 +938,9 @@ async def approve_llm_translation(job_id: str, request: Dict):
                 "original_text": segment.original_text,
                 "translated_text": segment.llm_translation or "",
                 "approved_translation": segment.llm_translation or "",
-                "status": "approved",
+                "status": segment_status,
                 "edited_by": approved_by,
-                "edited_at": datetime.utcnow().isoformat(),
+                "edited_at": getattr(segment, 'edited_at', None) or datetime.utcnow().isoformat(),
                 "confidence": segment.confidence_score,
                 "notes": notes
             }

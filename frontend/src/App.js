@@ -99,44 +99,46 @@ function App() {
 
   return (
     <AuthContext.Provider value={{ user, login, logout }}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         {user && <Navbar healthStatus={healthStatus} />}
         
-        <main className="container mx-auto px-4 py-8">
-          <Routes>
-            <Route 
-              path="/login" 
-              element={user ? <Navigate to="/dashboard" /> : <Login />} 
-            />
-            <Route 
-              path="/dashboard" 
-              element={user ? <Dashboard /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/upload" 
-              element={user ? <FileUpload /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/translation" 
-              element={user ? <TranslationJobs /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/evaluation" 
-              element={user ? <Evaluation /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/ground-truth" 
-              element={user ? <GroundTruth /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/metrics" 
-              element={user ? <Metrics /> : <Navigate to="/login" />} 
-            />
-            <Route 
-              path="/" 
-              element={<Navigate to={user ? "/dashboard" : "/login"} />} 
-            />
-          </Routes>
+        <main className="container mx-auto px-4 py-8 flex-1 overflow-hidden">
+          <div className="h-full overflow-y-auto">
+            <Routes>
+              <Route 
+                path="/login" 
+                element={user ? <Navigate to="/dashboard" /> : <Login />} 
+              />
+              <Route 
+                path="/dashboard" 
+                element={user ? <Dashboard /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/upload" 
+                element={user ? <FileUpload /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/translation" 
+                element={user ? <TranslationJobs /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/evaluation" 
+                element={user ? <Evaluation /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/ground-truth" 
+                element={user ? <GroundTruth /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/metrics" 
+                element={user ? <Metrics /> : <Navigate to="/login" />} 
+              />
+              <Route 
+                path="/" 
+                element={<Navigate to={user ? "/dashboard" : "/login"} />} 
+              />
+            </Routes>
+          </div>
         </main>
       </div>
     </AuthContext.Provider>

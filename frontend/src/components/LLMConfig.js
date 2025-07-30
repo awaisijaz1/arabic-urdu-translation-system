@@ -98,7 +98,7 @@ const LLMConfig = () => {
   const updateConfigMutation = useMutation(
     (data) => axios.post('/translate/llm/config', data),
     {
-      onSuccess: () => {
+      onSuccess: (response) => {
         toast.success('LLM configuration updated successfully!');
         setIsEditing(false);
         setShowAddProvider(false);
@@ -107,6 +107,12 @@ const LLMConfig = () => {
         setShowEditProvider(false);
         setShowEditModel(false);
         setShowEditPrompt(false);
+        
+        // Update current config with the response data
+        if (response.data && response.data.current_config) {
+          setCurrentConfig(response.data.current_config);
+        }
+        
         queryClient.invalidateQueries(['llmConfig', 'llmProviders', 'llmModels', 'llmPrompts', 'llmLogs']);
       },
       onError: (error) => {
@@ -402,9 +408,11 @@ const LLMConfig = () => {
                         onChange={(e) => setCurrentConfig({...currentConfig, model: e.target.value})}
                         className="w-full p-2 border border-gray-300 rounded-md text-sm"
                       >
-                        {models?.models && Object.entries(models.models).map(([id, model]) => (
-                          <option key={id} value={model.model_id}>{model.name}</option>
-                        ))}
+                        {models?.models && Object.entries(models.models)
+                          .filter(([id, model]) => model.provider === currentConfig.provider)
+                          .map(([id, model]) => (
+                            <option key={id} value={model.model_id}>{model.name}</option>
+                          ))}
                       </select>
                     </div>
                   </div>
@@ -455,7 +463,10 @@ const LLMConfig = () => {
                   </div>
                   <div>
                     <span className="text-xs text-gray-500">Model</span>
-                    <p className="text-sm font-medium">{models?.models?.[`${currentConfig.provider}_${currentConfig.model}`]?.name || currentConfig.model}</p>
+                    <p className="text-sm font-medium">
+                      {models?.models && Object.entries(models.models)
+                        .find(([id, model]) => model.provider === currentConfig.provider && model.model_id === currentConfig.model)?.[1]?.name || currentConfig.model}
+                    </p>
                   </div>
                   <div>
                     <span className="text-xs text-gray-500">Temperature</span>

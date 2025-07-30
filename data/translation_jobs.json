@@ -20,7 +20,9 @@
           "has_arabic_numerals": false,
           "overall_quality_score": 0.8999999999999999
         },
-        "translation_time": 1753710237.933313
+        "translation_time": 1.3882880453346345,
+        "is_edited": false,
+        "edited_at": null
       }
     ],
     "status": "approved",
@@ -52,7 +54,9 @@
           "has_arabic_numerals": false,
           "overall_quality_score": 0.8999999999999999
         },
-        "translation_time": 1753710352.704777
+        "translation_time": 1.674965540358004,
+        "is_edited": false,
+        "edited_at": null
       },
       {
         "segment_id": "segment_2",
@@ -71,7 +75,9 @@
           "has_arabic_numerals": false,
           "overall_quality_score": 0.8999999999999999
         },
-        "translation_time": 0.49831566666666666
+        "translation_time": 0.49831566666666666,
+        "is_edited": false,
+        "edited_at": null
       },
       {
         "segment_id": "segment_3",
@@ -90,7 +96,9 @@
           "has_arabic_numerals": false,
           "overall_quality_score": 0.8999999999999999
         },
-        "translation_time": 1753710434.035816
+        "translation_time": 2.0427438529819657,
+        "is_edited": false,
+        "edited_at": null
       }
     ],
     "status": "approved",
@@ -98,6 +106,2190 @@
     "completed_at": "2025-07-28T13:45:16.752365",
     "total_segments": 3,
     "completed_segments": 3,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753726250": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753726250",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "خبروں میں خوش آمدید",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.35,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 27,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.38881366666666667,
+        "is_edited": true,
+        "edited_at": "2025-07-29T07:43:14.529867"
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "یہ مشرق وسطی سے ایک خبری رپورٹ ہے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.03125,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 8,
+          "character_count": 33,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.38881366666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "آپ کی توجہ کا شکریہ",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.4736842105263157,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 28,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.38881366666666667,
+        "is_edited": true,
+        "edited_at": "2025-07-29T07:42:44.560017"
+      }
+    ],
+    "status": "approved",
+    "created_at": "2025-07-28T18:10:50.865759",
+    "completed_at": "2025-07-28T18:10:52.058913",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753726321": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753726321",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے خبروں میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.35,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 27,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.8152903333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "یہ مشرق وسطی سے ایک خبری رپورٹ ہے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.03125,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 8,
+          "character_count": 33,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.8152903333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "آپ کی دیکھ بھال کے لیے شکریہ",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.4736842105263157,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 28,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.8152903333333333,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T18:12:01.036826",
+    "completed_at": "2025-07-28T18:12:03.500209",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_test_config_1753726943": {
+    "job_id": "llm_test_config_1753726943",
+    "file_id": "test_config",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر آمدید",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 0.75,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 4,
+          "character_count": 15,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.849287,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T18:22:23.746776",
+    "completed_at": "2025-07-28T18:22:24.608689",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_test_config_final_1753728643": {
+    "job_id": "llm_test_config_final_1753728643",
+    "file_id": "test_config_final",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T18:50:43.944818",
+    "completed_at": "2025-07-28T20:08:10.417003",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_test_restart_1753728702": {
+    "job_id": "llm_test_restart_1753728702",
+    "file_id": "test_restart",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T18:51:42.141328",
+    "completed_at": "2025-07-28T20:08:10.417013",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_test_final_config_1753729453": {
+    "job_id": "llm_test_final_config_1753729453",
+    "file_id": "test_final_config",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر آمدید",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 0.75,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 4,
+          "character_count": 15,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 1.475792,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T19:04:13.433622",
+    "completed_at": "2025-07-28T19:04:14.921749",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_test_openai_gpt4_1753729959": {
+    "job_id": "llm_test_openai_gpt4_1753729959",
+    "file_id": "test_openai_gpt4",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T19:12:39.416936",
+    "completed_at": "2025-07-28T20:08:10.417015",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_test_openai_retry_1753730059": {
+    "job_id": "llm_test_openai_retry_1753730059",
+    "file_id": "test_openai_retry",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T19:14:19.984831",
+    "completed_at": "2025-07-28T20:08:10.417016",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_test_azure_openai_1753730176": {
+    "job_id": "llm_test_azure_openai_1753730176",
+    "file_id": "test_azure_openai",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T19:16:16.155936",
+    "completed_at": "2025-07-28T20:08:10.417017",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753730451": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753730451",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے خبروں میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.35,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 27,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.38008933333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "یہ ایک خبری رپورٹ ہے مشرق وسطی سے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.03125,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 8,
+          "character_count": 33,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.38008933333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "آپ کا شکریہ آپ کی دیکھ بھال کے لیے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.7894736842105263,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 9,
+          "character_count": 34,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.38008933333333333,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T19:20:51.256379",
+    "completed_at": "2025-07-28T19:20:52.408510",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_test_azure_gpt4o_1753730778": {
+    "job_id": "llm_test_azure_gpt4o_1753730778",
+    "file_id": "test_azure_gpt4o",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T19:26:18.172980",
+    "completed_at": "2025-07-28T20:08:10.417018",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_test_azure_fixed_1753730845": {
+    "job_id": "llm_test_azure_fixed_1753730845",
+    "file_id": "test_azure_fixed",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T19:27:25.419999",
+    "completed_at": "2025-07-28T20:08:10.417019",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_test_azure_fresh_1753731005": {
+    "job_id": "llm_test_azure_fresh_1753731005",
+    "file_id": "test_azure_fresh",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T19:30:05.042582",
+    "completed_at": "2025-07-28T20:08:10.417020",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753732071": {
+    "job_id": "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753732071",
+    "file_id": "109b7cc3-df04-4a56-a376-612b6a0bc40f",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في النشرة الإخبارية المسائية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "نبدأ مع آخر الأخبار السياسية من العاصمة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "اجتمع مجلس الوزراء اليوم لمناقشة الميزانية الجديدة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_4",
+        "original_text": "وأعلن رئيس الوزراء عن خطة اقتصادية شاملة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_5",
+        "original_text": "في مجال الرياضة، فاز الفريق المحلي بالدوري",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_6",
+        "original_text": "وسجل اللاعب النجم هدفين في المباراة النهائية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_7",
+        "original_text": "أما في مجال الطقس، فمن المتوقع أن يكون اليوم مشمساً",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_8",
+        "original_text": "مع درجات حرارة تتراوح بين 25 و 30 درجة مئوية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_9",
+        "original_text": "وفي الأخبار الدولية، عقد مؤتمر قمة في أوروبا",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_10",
+        "original_text": "للمناقشة حول التغيرات المناخية والطاقة المتجددة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_11",
+        "original_text": "وأكد المشاركون على أهمية التعاون الدولي",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_12",
+        "original_text": "في مجال التكنولوجيا، أعلنت شركة عالمية عن منتج جديد",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_13",
+        "original_text": "يستخدم الذكاء الاصطناعي في تحسين الخدمات الصحية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_14",
+        "original_text": "وأخيراً، نذكركم بموعد البرنامج القادم غداً",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_15",
+        "original_text": "شكراً لكم على المشاهدة وإلى اللقاء في النشرة القادمة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T19:47:51.363734",
+    "completed_at": "2025-07-28T20:08:10.417021",
+    "total_segments": 15,
+    "completed_segments": 15,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753732179": {
+    "job_id": "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753732179",
+    "file_id": "109b7cc3-df04-4a56-a376-612b6a0bc40f",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في النشرة الإخبارية المسائية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "نبدأ مع آخر الأخبار السياسية من العاصمة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "اجتمع مجلس الوزراء اليوم لمناقشة الميزانية الجديدة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_4",
+        "original_text": "وأعلن رئيس الوزراء عن خطة اقتصادية شاملة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_5",
+        "original_text": "في مجال الرياضة، فاز الفريق المحلي بالدوري",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_6",
+        "original_text": "وسجل اللاعب النجم هدفين في المباراة النهائية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_7",
+        "original_text": "أما في مجال الطقس، فمن المتوقع أن يكون اليوم مشمساً",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_8",
+        "original_text": "مع درجات حرارة تتراوح بين 25 و 30 درجة مئوية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_9",
+        "original_text": "وفي الأخبار الدولية، عقد مؤتمر قمة في أوروبا",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_10",
+        "original_text": "للمناقشة حول التغيرات المناخية والطاقة المتجددة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_11",
+        "original_text": "وأكد المشاركون على أهمية التعاون الدولي",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_12",
+        "original_text": "في مجال التكنولوجيا، أعلنت شركة عالمية عن منتج جديد",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_13",
+        "original_text": "يستخدم الذكاء الاصطناعي في تحسين الخدمات الصحية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_14",
+        "original_text": "وأخيراً، نذكركم بموعد البرنامج القادم غداً",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_15",
+        "original_text": "شكراً لكم على المشاهدة وإلى اللقاء في النشرة القادمة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 404 - {'type': 'error', 'error': {'type': 'not_found_error', 'message': 'model: claude-3-sonnet-20240229'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T19:49:39.350808",
+    "completed_at": "2025-07-28T20:08:10.417022",
+    "total_segments": 15,
+    "completed_segments": 15,
+    "average_confidence": 0.0,
+    "average_quality_score": 0.0
+  },
+  "llm_test_fixed_translation_1753732692": {
+    "job_id": "llm_test_fixed_translation_1753732692",
+    "file_id": "test_fixed_translation",
+    "segments": [
+      {
+        "segment_id": "test_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے خبروں میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.35,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 27,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.843844,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T19:58:12.877575",
+    "completed_at": "2025-07-28T19:58:13.736113",
+    "total_segments": 1,
+    "completed_segments": 1,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753732917": {
+    "job_id": "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753732917",
+    "file_id": "109b7cc3-df04-4a56-a376-612b6a0bc40f",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في النشرة الإخبارية المسائية",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے ہمارے شام کی خبر نامے میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.131578947368421,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 11,
+          "character_count": 43,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.49598566666666666,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "نبدأ مع آخر الأخبار السياسية من العاصمة",
+        "translated_text": null,
+        "llm_translation": "ہم آغاز کریں گے سیاسی خبروں کے آخری حصے سے دارالحکومت سے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.435897435897436,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 12,
+          "character_count": 56,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.49598566666666666,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "اجتمع مجلس الوزراء اليوم لمناقشة الميزانية الجديدة",
+        "translated_text": null,
+        "llm_translation": "وزرائے اعظم کی کونسل آج اجتماع کرے گی نئے بجٹ کی بحث کرنے کے لیے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.28,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 15,
+          "character_count": 64,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.49598566666666666,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_4",
+        "original_text": "وأعلن رئيس الوزراء عن خطة اقتصادية شاملة",
+        "translated_text": null,
+        "llm_translation": "وزیر اعظم نے ایک جامع اقتصادی منصوبے کا اعلان کیا۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.25,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 10,
+          "character_count": 50,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.4604486666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_5",
+        "original_text": "في مجال الرياضة، فاز الفريق المحلي بالدوري",
+        "translated_text": null,
+        "llm_translation": "کھیل کے میدان میں، مقامی ٹیم نے لیگ جیت لی۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.0238095238095237,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 10,
+          "character_count": 43,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.4604486666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_6",
+        "original_text": "وسجل اللاعب النجم هدفين في المباراة النهائية",
+        "translated_text": null,
+        "llm_translation": "ستارہ کھلاڑی نے فائنل میچ میں دو گول کیے۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 0.9318181818181818,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 9,
+          "character_count": 41,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.4604486666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_7",
+        "original_text": "أما في مجال الطقس، فمن المتوقع أن يكون اليوم مشمساً",
+        "translated_text": null,
+        "llm_translation": "اس سے متعلق موسم کے حوالے سے، توقع ہے کہ آج دن میں دھوپ ہوگی۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.196078431372549,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 15,
+          "character_count": 61,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.5350933333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_8",
+        "original_text": "مع درجات حرارة تتراوح بين 25 و 30 درجة مئوية",
+        "translated_text": null,
+        "llm_translation": "درجہ حرارت 25 سے 30 ڈگری سینٹی گریڈ کے درمیان ہوگی۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.1590909090909092,
+          "has_urdu_script": true,
+          "has_numbers": true,
+          "has_punctuation": true,
+          "word_count": 11,
+          "character_count": 51,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.5350933333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_9",
+        "original_text": "وفي الأخبار الدولية، عقد مؤتمر قمة في أوروبا",
+        "translated_text": null,
+        "llm_translation": "بین الاقوامی خبروں میں، یورپ میں ایک سربراہی اجلاس منعقد ہوا۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.3863636363636365,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 11,
+          "character_count": 61,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.5350933333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_10",
+        "original_text": "للمناقشة حول التغيرات المناخية والطاقة المتجددة",
+        "translated_text": null,
+        "llm_translation": "آب کے بارے میں بحث کرنے کے لیے موسمی تبدیلیوں اور قابل تجدید توانائی",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.446808510638298,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 14,
+          "character_count": 68,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.5562436666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_11",
+        "original_text": "وأكد المشاركون على أهمية التعاون الدولي",
+        "translated_text": null,
+        "llm_translation": "شرکاء نے بین الاقوامی تعاون کی اہمیت پر زور دیا",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.205128205128205,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 10,
+          "character_count": 47,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.5562436666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_12",
+        "original_text": "في مجال التكنولوجيا، أعلنت شركة عالمية عن منتج جديد",
+        "translated_text": null,
+        "llm_translation": "ٹیکنالوجی کے شعبے میں، ایک عالمی کمپنی نے ایک نئے پروڈکٹ کا اعلان کیا",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.3529411764705883,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 14,
+          "character_count": 69,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.5562436666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_13",
+        "original_text": "يستخدم الذكاء الاصطناعي في تحسين الخدمات الصحية",
+        "translated_text": null,
+        "llm_translation": "مصنوعی ذہانت صحت کی خدمات کو بہتر بنانے میں استعمال کیا جاتا ہے۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.3617021276595744,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 13,
+          "character_count": 64,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.5552603333333334,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_14",
+        "original_text": "وأخيراً، نذكركم بموعد البرنامج القادم غداً",
+        "translated_text": null,
+        "llm_translation": "آخر میں، ہم آپ کو آنے والے پروگرام کی تاریخ کی یاد دلاتے ہیں۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.4523809523809523,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 14,
+          "character_count": 61,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.5552603333333334,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_15",
+        "original_text": "شكراً لكم على المشاهدة وإلى اللقاء في النشرة القادمة",
+        "translated_text": null,
+        "llm_translation": "آپ کی دیکھ بھال کے لیے شکریہ اور آنے والی خبر میں ملاقات کریں گے۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.25,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 15,
+          "character_count": 65,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.5552603333333334,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T20:01:57.618562",
+    "completed_at": "2025-07-28T20:02:59.122483",
+    "total_segments": 15,
+    "completed_segments": 15,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.9666666666666667
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753733004": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753733004",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے خبروں میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.35,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 27,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.540724,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "یہ مشرق وسطی سے ایک خبری رپورٹ ہے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.03125,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 8,
+          "character_count": 33,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.540724,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "آپ کی دیکھ بھال کرنے کے لیے شکریہ",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.736842105263158,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 8,
+          "character_count": 33,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.540724,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T20:03:24.134666",
+    "completed_at": "2025-07-28T20:03:25.782435",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753734584": {
+    "job_id": "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753734584",
+    "file_id": "109b7cc3-df04-4a56-a376-612b6a0bc40f",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في النشرة الإخبارية المسائية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "نبدأ مع آخر الأخبار السياسية من العاصمة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "اجتمع مجلس الوزراء اليوم لمناقشة الميزانية الجديدة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_4",
+        "original_text": "وأعلن رئيس الوزراء عن خطة اقتصادية شاملة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_5",
+        "original_text": "في مجال الرياضة، فاز الفريق المحلي بالدوري",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_6",
+        "original_text": "وسجل اللاعب النجم هدفين في المباراة النهائية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_7",
+        "original_text": "أما في مجال الطقس، فمن المتوقع أن يكون اليوم مشمساً",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_8",
+        "original_text": "مع درجات حرارة تتراوح بين 25 و 30 درجة مئوية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_9",
+        "original_text": "وفي الأخبار الدولية، عقد مؤتمر قمة في أوروبا",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_10",
+        "original_text": "للمناقشة حول التغيرات المناخية والطاقة المتجددة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_11",
+        "original_text": "وأكد المشاركون على أهمية التعاون الدولي",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_12",
+        "original_text": "في مجال التكنولوجيا، أعلنت شركة عالمية عن منتج جديد",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_13",
+        "original_text": "يستخدم الذكاء الاصطناعي في تحسين الخدمات الصحية",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_14",
+        "original_text": "وأخيراً، نذكركم بموعد البرنامج القادم غداً",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_15",
+        "original_text": "شكراً لكم على المشاهدة وإلى اللقاء في النشرة القادمة",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T20:29:44.037119",
+    "completed_at": "2025-07-28T20:48:06.063597",
+    "total_segments": 15,
+    "completed_segments": 15,
+    "average_confidence": null,
+    "average_quality_score": null
+  },
+  "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753734634": {
+    "job_id": "llm_109b7cc3-df04-4a56-a376-612b6a0bc40f_1753734634",
+    "file_id": "109b7cc3-df04-4a56-a376-612b6a0bc40f",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في النشرة الإخبارية المسائية",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے ہمارے شام کی خبر نامے میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.131578947368421,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 11,
+          "character_count": 43,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.5543656666666666,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "نبدأ مع آخر الأخبار السياسية من العاصمة",
+        "translated_text": null,
+        "llm_translation": "ہم آغاز کریں گے سیاسی خبروں کے آخری حصے سے دارالحکومت سے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.435897435897436,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 12,
+          "character_count": 56,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.5543656666666666,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "اجتمع مجلس الوزراء اليوم لمناقشة الميزانية الجديدة",
+        "translated_text": null,
+        "llm_translation": "وزرائے اعظم کی کونسل آج اجتماع کرے گی نئے بجٹ کی بحث کرنے کے لیے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.28,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 15,
+          "character_count": 64,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.5543656666666666,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_4",
+        "original_text": "وأعلن رئيس الوزراء عن خطة اقتصادية شاملة",
+        "translated_text": null,
+        "llm_translation": "وزیر اعظم نے ایک جامع اقتصادی منصوبے کا اعلان کیا۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.25,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 10,
+          "character_count": 50,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 1.1209416666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_5",
+        "original_text": "في مجال الرياضة، فاز الفريق المحلي بالدوري",
+        "translated_text": null,
+        "llm_translation": "کھیل کے میدان میں، مقامی ٹیم نے لیگ جیت لی۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.0238095238095237,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 10,
+          "character_count": 43,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 1.1209416666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_6",
+        "original_text": "وسجل اللاعب النجم هدفين في المباراة النهائية",
+        "translated_text": null,
+        "llm_translation": "ستارہ کھلاڑی نے فائنل میچ میں دو گول کیے۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 0.9318181818181818,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 9,
+          "character_count": 41,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 1.1209416666666667,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_7",
+        "original_text": "أما في مجال الطقس، فمن المتوقع أن يكون اليوم مشمساً",
+        "translated_text": null,
+        "llm_translation": "اس میں موسم کا معاملہ ہے، توقع ہے کہ آج دن روشن ہوگا۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.0392156862745099,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 13,
+          "character_count": 53,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.583404,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_8",
+        "original_text": "مع درجات حرارة تتراوح بين 25 و 30 درجة مئوية",
+        "translated_text": null,
+        "llm_translation": "درجہ حرارت 25 سے 30 ڈگری سینٹی گریڈ کے درمیان ہوگی۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.1590909090909092,
+          "has_urdu_script": true,
+          "has_numbers": true,
+          "has_punctuation": true,
+          "word_count": 11,
+          "character_count": 51,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.583404,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_9",
+        "original_text": "وفي الأخبار الدولية، عقد مؤتمر قمة في أوروبا",
+        "translated_text": null,
+        "llm_translation": "عالمی خبروں میں، یورپ میں ایک سربراہی اجلاس منعقد ہوا۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.2272727272727273,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 10,
+          "character_count": 54,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.583404,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_10",
+        "original_text": "للمناقشة حول التغيرات المناخية والطاقة المتجددة",
+        "translated_text": null,
+        "llm_translation": "آب کے تبدیلی اور تجدید پذیر توانائی پر بحث کرنے کے لیے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.148936170212766,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 12,
+          "character_count": 54,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.48849633333333337,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_11",
+        "original_text": "وأكد المشاركون على أهمية التعاون الدولي",
+        "translated_text": null,
+        "llm_translation": "شرکاء نے بین الاقوامی تعاون کی اہمیت پر زور دیا",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.205128205128205,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 10,
+          "character_count": 47,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.48849633333333337,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_12",
+        "original_text": "في مجال التكنولوجيا، أعلنت شركة عالمية عن منتج جديد",
+        "translated_text": null,
+        "llm_translation": "ٹیکنالوجی کے شعبے میں، ایک عالمی کمپنی نے ایک نئے پروڈکٹ کا اعلان کیا",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.3529411764705883,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 14,
+          "character_count": 69,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.48849633333333337,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_13",
+        "original_text": "يستخدم الذكاء الاصطناعي في تحسين الخدمات الصحية",
+        "translated_text": null,
+        "llm_translation": "مصنوعی ذہانت صحت کی خدمات کو بہتر بنانے میں استعمال کیا جاتا ہے۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.3617021276595744,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 13,
+          "character_count": 64,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.558635,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_14",
+        "original_text": "وأخيراً، نذكركم بموعد البرنامج القادم غداً",
+        "translated_text": null,
+        "llm_translation": "آخر میں، ہم آپ کو آنے والے پروگرام کی تاریخ کی یاد دلاتے ہیں۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.4523809523809523,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 14,
+          "character_count": 61,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.558635,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_15",
+        "original_text": "شكراً لكم على المشاهدة وإلى اللقاء في النشرة القادمة",
+        "translated_text": null,
+        "llm_translation": "آپ کی دیکھ بھال کے لیے شکریہ اور آنے والی خبر میں ملاقات تک۔",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.1538461538461537,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": true,
+          "word_count": 14,
+          "character_count": 60,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 1.0
+        },
+        "translation_time": 0.558635,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T20:30:34.101692",
+    "completed_at": "2025-07-28T20:31:35.781804",
+    "total_segments": 15,
+    "completed_segments": 15,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.9666666666666667
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753735115": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753735115",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے خبروں میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.35,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 27,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.6491683333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "یہ مشرق وسطی سے ایک خبری رپورٹ ہے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.03125,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 8,
+          "character_count": 33,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.6491683333333333,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "آپ کی دیکھ بھال کے لیے شکریہ",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.4736842105263157,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 28,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.6491683333333333,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "completed",
+    "created_at": "2025-07-28T20:38:35.584717",
+    "completed_at": "2025-07-28T20:38:37.560395",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753735183": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753735183",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T20:39:43.269707",
+    "completed_at": "2025-07-28T20:48:06.063608",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": null,
+    "average_quality_score": null
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753735814": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753735814",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "[Translation failed: Error code: 401 - {'error': {'message': 'Incorrect API key provided: acea2725********************eb74. You can find your API key at https://platform.openai.com/account/api-keys.', 'type': 'invalid_request_error', 'param': None, 'code': 'invalid_api_key'}}]",
+        "confidence_score": 0.0,
+        "quality_metrics": {
+          "overall_quality_score": 0.0
+        },
+        "translation_time": 0.0,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "failed",
+    "created_at": "2025-07-28T20:50:14.496512",
+    "completed_at": "2025-07-28T20:50:15.694307",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": null,
+    "average_quality_score": null
+  },
+  "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753735845": {
+    "job_id": "llm_b13b776d-16c1-44bb-abae-7f3323c4af43_1753735845",
+    "file_id": "b13b776d-16c1-44bb-abae-7f3323c4af43",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے خبروں میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.35,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 27,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.40504500000000004,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_2",
+        "original_text": "هذا تقرير إخباري من الشرق الأوسط",
+        "translated_text": null,
+        "llm_translation": "یہ مشرق وسطی سے ایک خبری رپورٹ ہے",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.03125,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 8,
+          "character_count": 33,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.40504500000000004,
+        "is_edited": false,
+        "edited_at": null
+      },
+      {
+        "segment_id": "segment_3",
+        "original_text": "نشكركم على مشاهدتكم",
+        "translated_text": null,
+        "llm_translation": "آپ کی دیکھ بھال کے لیے شکریہ",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 1.4736842105263157,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 7,
+          "character_count": 28,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 0.40504500000000004,
+        "is_edited": false,
+        "edited_at": null
+      }
+    ],
+    "status": "approved",
+    "created_at": "2025-07-28T20:50:45.456848",
+    "completed_at": "2025-07-28T20:50:46.702171",
+    "total_segments": 3,
+    "completed_segments": 3,
+    "average_confidence": 1.0,
+    "average_quality_score": 0.8999999999999999
+  },
+  "llm_test_edit_segments_1753773970": {
+    "job_id": "llm_test_edit_segments_1753773970",
+    "file_id": "test_edit_segments",
+    "segments": [
+      {
+        "segment_id": "segment_1",
+        "original_text": "مرحبا بكم في الأخبار",
+        "translated_text": null,
+        "llm_translation": "آپ کا خیر مقدم ہے ہمارے خبر نامے میں",
+        "confidence_score": 1.0,
+        "quality_metrics": {
+          "length_ratio": 0.75,
+          "has_urdu_script": true,
+          "has_numbers": false,
+          "has_punctuation": false,
+          "word_count": 4,
+          "character_count": 15,
+          "is_not_empty": true,
+          "has_arabic_numerals": false,
+          "overall_quality_score": 0.8999999999999999
+        },
+        "translation_time": 2.5795387617570142,
+        "is_edited": true,
+        "edited_at": "2025-07-29T07:27:50.365872"
+      }
+    ],
+    "status": "approved",
+    "created_at": "2025-07-29T07:26:10.640014",
+    "completed_at": "2025-07-29T07:26:11.626310",
+    "total_segments": 1,
+    "completed_segments": 1,
     "average_confidence": 1.0,
     "average_quality_score": 0.8999999999999999
   }

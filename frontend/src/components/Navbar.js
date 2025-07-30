@@ -33,17 +33,17 @@ const Navbar = ({ healthStatus }) => {
   const isActive = (href) => location.pathname === href;
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-white shadow-lg mb-4">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
+        <div className="flex items-center h-20">
+          <div className="flex items-center flex-1">
             <div className="flex-shrink-0 flex items-center">
               <Link to="/dashboard" className="text-xl font-bold text-blue-600">
                 Translation Evaluation
               </Link>
             </div>
             
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            <div className="hidden sm:ml-6 sm:flex sm:space-x-6">
               {navigation.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -56,45 +56,45 @@ const Navbar = ({ healthStatus }) => {
                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                     }`}
                   >
-                    <Icon className="h-4 w-4 mr-2" />
-                    {item.name}
+                    <Icon className="h-4 w-4 mr-1" />
+                    <span className="hidden lg:inline">{item.name}</span>
+                    <span className="lg:hidden">{item.name.split(' ')[0]}</span>
                   </Link>
                 );
               })}
             </div>
           </div>
 
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-            {/* Health Status */}
-            <div className="flex items-center">
+          <div className="hidden sm:flex sm:items-center sm:space-x-3 flex-shrink-0 ml-8">
+            {/* User Menu - Compact Version */}
+            <div className="relative flex items-center space-x-2 bg-gray-50 rounded-lg px-3 py-2">
+              <User className="h-4 w-4 text-gray-400" />
+              <span className="text-sm text-gray-700 max-w-20 truncate">{user?.username}</span>
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                {user?.role}
+              </span>
+            </div>
+
+            <button
+              onClick={logout}
+              className="inline-flex items-center px-2 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 hover:text-gray-700 focus:outline-none"
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="ml-1 hidden lg:inline">Logout</span>
+            </button>
+
+            {/* Health Status - Compact */}
+            <div className="flex items-center border-l border-gray-200 pl-2" title={`System Status: ${healthStatus?.status || 'unknown'}`}>
               {healthStatus?.status === 'healthy' ? (
                 <Wifi className="h-4 w-4 text-green-500" />
               ) : (
                 <WifiOff className="h-4 w-4 text-red-500" />
               )}
-              <span className="ml-1 text-xs text-gray-500">
+              <span className="ml-1 text-xs text-gray-500 hidden xl:inline">
                 {healthStatus?.status || 'unknown'}
               </span>
             </div>
-
-            {/* User Menu */}
-            <div className="relative">
-              <div className="flex items-center space-x-2">
-                <User className="h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-700">{user?.username}</span>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  {user?.role}
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={logout}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 hover:text-gray-700 focus:outline-none"
-            >
-              <LogOut className="h-4 w-4 mr-1" />
-              Logout
-            </button>
           </div>
 
           {/* Mobile menu button */}

@@ -7,6 +7,7 @@ from typing import Dict, List, Optional, Tuple
 from pydantic import BaseModel
 
 from langchain_anthropic import ChatAnthropic
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.output_parsers import StrOutputParser
@@ -24,6 +25,8 @@ class TranslationSegment(BaseModel):
     confidence_score: Optional[float] = None
     quality_metrics: Optional[Dict] = None
     translation_time: Optional[float] = None
+    is_edited: Optional[bool] = False
+    edited_at: Optional[str] = None
 
 
 class TranslationJob(BaseModel):
@@ -91,7 +94,9 @@ class PersistentJobStorage:
                             "llm_translation": s.llm_translation,
                             "confidence_score": s.confidence_score,
                             "quality_metrics": s.quality_metrics,
-                            "translation_time": s.translation_time
+                            "translation_time": s.translation_time,
+                            "is_edited": s.is_edited,
+                            "edited_at": s.edited_at
                         } for s in job.segments
                     ],
                     "status": job.status,
@@ -153,39 +158,14 @@ class LangChainTranslator:
     
     def __init__(self):
         """Initialize the LangChain translator"""
-        api_key = os.getenv("ANTHROPIC_API_KEY")
-        if not api_key:
-            raise ValueError("ANTHROPIC_API_KEY environment variable is required")
-        
         # Initialize persistent storage
         self.storage = PersistentJobStorage()
         
         # Load existing jobs from storage
         self.translation_jobs: Dict[str, TranslationJob] = self.storage.load_jobs()
         
-        # Initialize LangChain components
-        self.model = ChatAnthropic(
-            model=os.getenv("CLAUDE_MODEL", "claude-3-haiku-20240307"),
-            anthropic_api_key=api_key,
-            max_tokens=1000,
-            temperature=0.1  # Low temperature for consistent translations
-        )
-        
-        # Create translation memory for context
-        self.memory = ConversationBufferMemory(
-            memory_key="translation_history",
-            return_messages=True
-        )
-        
-        # Create the system prompt template
-        self.system_prompt = ChatPromptTemplate.from_messages([
-            ("system", self._get_system_prompt()),
-            MessagesPlaceholder(variable_name="translation_history"),
-            ("human", "{user_input}")
-        ])
-        
-        # Create the translation chain
-        self.translation_chain = self.system_prompt | self.model | TranslationOutputParser()
+        # Initialize with default configuration
+        self._initialize_llm()
         
         # Rate limiting configuration
         self.max_requests_per_minute = 5
@@ -194,9 +174,128 @@ class LangChainTranslator:
         self.max_prompt_tokens = 4000  # Conservative token limit
         self.retry_delay = 60  # Seconds to wait on rate limit
     
+    def _get_current_config(self) -> Dict:
+        """Get the current LLM configuration from the main service"""
+        try:
+            # Import here to avoid circular imports
+            from main import llm_config
+            config = llm_config.get("current_config", {})
+            print(f"DEBUG: Loaded config: {config}")  # Debug line
+            return config
+        except ImportError:
+            # Fallback to environment variables
+            return {
+                "provider": "anthropic",
+                "model": "claude-3-haiku-20240307",
+                "system_prompt": "You are an expert Arabic to Urdu translator. Provide accurate, natural translations that maintain the original meaning and tone.",
+                "temperature": 0.1,
+                "max_tokens": 1000
+            }
+    
+    def _get_provider_config(self, provider_id: str) -> Dict:
+        """Get provider configuration"""
+        try:
+            from main import llm_config
+            provider_config = llm_config.get("api_providers", {}).get(provider_id, {})
+            print(f"DEBUG: Provider config for {provider_id}: {provider_config}")  # Debug line
+            return provider_config
+        except ImportError:
+            return {}
+    
+    def _get_model_config(self, model_id: str) -> Dict:
+        """Get model configuration"""
+        try:
+            from main import llm_config
+            return llm_config.get("models", {}).get(model_id, {})
+        except ImportError:
+            return {}
+    
+    def _initialize_llm(self):
+        """Initialize the LLM based on current configuration"""
+        config = self._get_current_config()
+        provider_id = config.get("provider", "anthropic")
+        model_id = config.get("model", "claude-3-haiku-20240307")
+        temperature = config.get("temperature", 0.1)
+        max_tokens = config.get("max_tokens", 1000)
+        
+        # Get provider configuration
+        provider_config = self._get_provider_config(provider_id)
+        model_config = self._get_model_config(model_id)
+        
+        # Use model config if available, otherwise use defaults
+        if model_config:
+            temperature = model_config.get("temperature", temperature)
+            max_tokens = model_config.get("max_tokens", max_tokens)
+        
+        # Initialize the appropriate LLM based on provider
+        if provider_id.lower() == "openai":
+            # Handle both Pydantic objects and dictionaries
+            if hasattr(provider_config, 'api_key'):
+                api_key = provider_config.api_key
+                base_url = getattr(provider_config, 'base_url', None)
+            elif isinstance(provider_config, dict):
+                api_key = provider_config.get("api_key", "")
+                base_url = provider_config.get("base_url", None)
+            else:
+                api_key = ""
+                base_url = None
+            
+            api_key = api_key or os.getenv("OPENAI_API_KEY")
+            if not api_key:
+                raise ValueError(f"OpenAI API key not found for provider {provider_id}")
+            
+            # Initialize ChatOpenAI with base_url if provided (for Azure OpenAI)
+            model_kwargs = {
+                "model": model_id,
+                "openai_api_key": api_key,
+                "max_tokens": max_tokens,
+                "temperature": temperature
+            }
+            
+            if base_url:
+                model_kwargs["base_url"] = base_url
+            
+            self.model = ChatOpenAI(**model_kwargs)
+        else:  # Default to Anthropic
+            # Handle both Pydantic objects and dictionaries
+            if hasattr(provider_config, 'api_key'):
+                api_key = provider_config.api_key
+            elif isinstance(provider_config, dict):
+                api_key = provider_config.get("api_key", "")
+            else:
+                api_key = ""
+            
+            api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
+            if not api_key:
+                raise ValueError(f"Anthropic API key not found for provider {provider_id}")
+            
+            self.model = ChatAnthropic(
+                model=model_id,
+                anthropic_api_key=api_key,
+                max_tokens=max_tokens,
+                temperature=temperature
+            )
+        
+        # Create translation memory for context
+        self.memory = ConversationBufferMemory(
+            memory_key="translation_history",
+            return_messages=True
+        )
+        
+        # Create the system prompt template with current configuration
+        self.system_prompt = ChatPromptTemplate.from_messages([
+            ("system", self._get_system_prompt()),
+            MessagesPlaceholder(variable_name="translation_history"),
+            ("human", "{user_input}")
+        ])
+        
+        # Create the translation chain
+        self.translation_chain = self.system_prompt | self.model | TranslationOutputParser()
+    
     def _get_system_prompt(self) -> str:
-        """Get the comprehensive system prompt for Arabic to Urdu translation"""
-        return """You are a highly skilled professional translator specializing in Arabic to Urdu translation with over 20 years of experience in broadcast media translation.
+        """Get the system prompt from current configuration"""
+        config = self._get_current_config()
+        return config.get("system_prompt", """You are a highly skilled professional translator specializing in Arabic to Urdu translation with over 20 years of experience in broadcast media translation.
 
 Your expertise includes:
 - Deep understanding of Arabic and Urdu linguistics
@@ -248,7 +347,11 @@ Example:
 Used formal register appropriate for news broadcast
 </translation_notes>
 
-Remember: Your goal is to produce translations that are not only accurate but also natural, professional, and suitable for broadcast media."""
+Remember: Your goal is to produce translations that are not only accurate but also natural, professional, and suitable for broadcast media.""")
+    
+    def refresh_configuration(self):
+        """Refresh the LLM configuration - call this when config changes"""
+        self._initialize_llm()
     
     async def translate_segment(self, arabic_text: str, context: Optional[str] = None) -> Dict:
         """Translate a single segment with context awareness"""
@@ -419,9 +522,22 @@ Remember: Your goal is to produce translations that are not only accurate but al
             
             print(f"Processing {len(chunks)} chunks for job {job.job_id}")
             
+            # Track if any chunks failed
+            any_chunks_failed = False
+            
             # Process each chunk
             for chunk_index, chunk in enumerate(chunks):
-                await self._process_single_chunk(chunk, job, chunk_index)
+                try:
+                    await self._process_single_chunk(chunk, job, chunk_index)
+                except Exception as e:
+                    print(f"Chunk {chunk_index + 1} failed: {str(e)}")
+                    any_chunks_failed = True
+                    # Mark segments in this chunk as failed
+                    for segment in chunk:
+                        segment.llm_translation = f"[Translation failed: {str(e)}]"
+                        segment.confidence_score = 0.0
+                        segment.quality_metrics = {"overall_quality_score": 0.0}
+                        segment.translation_time = 0.0
                 
                 # Update progress and save
                 job.completed_segments = sum(1 for s in job.segments if s.llm_translation is not None)
@@ -431,19 +547,25 @@ Remember: Your goal is to produce translations that are not only accurate but al
                 await self._check_rate_limit()
             
             # Calculate final metrics
-            completed_segments = [s for s in job.segments if s.llm_translation is not None]
+            completed_segments = [s for s in job.segments if s.llm_translation is not None and not s.llm_translation.startswith("[Translation failed:")]
             if completed_segments:
                 job.average_confidence = sum(s.confidence_score or 0 for s in completed_segments) / len(completed_segments)
                 job.average_quality_score = sum(s.quality_metrics.get("overall_quality_score", 0) for s in completed_segments) / len(completed_segments)
             
-            job.status = "completed"
+            # Set final status based on whether any chunks failed
+            if any_chunks_failed:
+                job.status = "failed"
+                print(f"Job {job.job_id} failed due to chunk processing errors")
+            else:
+                job.status = "completed"
+                print(f"Job {job.job_id} completed successfully")
+            
             job.completed_at = datetime.utcnow()
             self.storage.save_jobs(self.translation_jobs)
             
-            print(f"Job {job.job_id} completed successfully")
-            
         except Exception as e:
             job.status = "failed"
+            job.completed_at = datetime.utcnow()
             self.storage.save_jobs(self.translation_jobs)
             print(f"Job {job.job_id} failed: {str(e)}")
             raise
@@ -525,12 +647,14 @@ Remember: Your goal is to produce translations that are not only accurate but al
             
         except Exception as e:
             print(f"Chunk processing failed: {str(e)}")
-            # Mark segments as failed but continue
+            # Mark segments as failed
             for segment in chunk:
                 segment.llm_translation = f"[Translation failed: {str(e)}]"
                 segment.confidence_score = 0.0
                 segment.quality_metrics = {"overall_quality_score": 0.0}
                 segment.translation_time = 0.0
+            # Re-raise the exception to trigger any_chunks_failed
+            raise e
 
     async def _translate_batch_with_retry(self, batch_prompt: str, max_retries: int = 3) -> str:
         """Translate batch with intelligent retry logic for rate limiting"""
@@ -707,11 +831,41 @@ Provide only the Urdu translation:"""
         """Get translation metrics"""
         jobs = self.list_jobs()
         completed_jobs = [j for j in jobs if j.status in ["completed", "approved"]]
+        failed_jobs = [j for j in jobs if j.status == "failed"]
+        
+        # Calculate metrics only from successful segments
+        total_segments_translated = 0
+        total_confidence = 0
+        total_quality_score = 0
+        total_translation_time = 0
+        successful_segments_count = 0
+        
+        for job in completed_jobs:
+            for segment in job.segments:
+                # Only count segments that were successfully translated (not failed)
+                if (segment.llm_translation and 
+                    not segment.llm_translation.startswith("[Translation failed:") and
+                    segment.confidence_score is not None):
+                    total_segments_translated += 1
+                    total_confidence += segment.confidence_score
+                    if segment.quality_metrics and segment.quality_metrics.get("overall_quality_score"):
+                        total_quality_score += segment.quality_metrics["overall_quality_score"]
+                    if segment.translation_time:
+                        total_translation_time += segment.translation_time
+                    successful_segments_count += 1
+        
+        # Calculate averages
+        average_confidence = total_confidence / successful_segments_count if successful_segments_count > 0 else 0
+        average_quality_score = total_quality_score / successful_segments_count if successful_segments_count > 0 else 0
+        average_translation_time = total_translation_time / successful_segments_count if successful_segments_count > 0 else 0
         
         return {
             "total_jobs": len(jobs),
             "completed_jobs": len(completed_jobs),
-            "total_segments_translated": sum(j.completed_segments for j in completed_jobs),
-            "average_confidence": sum(j.average_confidence for j in completed_jobs) / len(completed_jobs) if completed_jobs else 0,
-            "average_quality_score": sum(j.average_quality_score for j in completed_jobs) / len(completed_jobs) if completed_jobs else 0
+            "failed_jobs": len(failed_jobs),
+            "total_segments_translated": total_segments_translated,
+            "average_confidence": average_confidence,
+            "average_quality_score": average_quality_score,
+            "average_translation_time": average_translation_time,
+            "timestamp": datetime.utcnow().isoformat()
         } 
