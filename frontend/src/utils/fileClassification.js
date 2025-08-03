@@ -23,13 +23,30 @@ export const hasTranslationPairs = (fileContent) => {
 
 /**
  * Get file classification status
- * @param {Object} fileContent - The parsed file content
+ * @param {Object|Array} fileContent - The parsed file content or segments array
  * @returns {string} - 'arabic_only' | 'arabic_urdu_pairs' | 'unknown'
  */
 export const getFileClassification = (fileContent) => {
   if (!fileContent) return 'unknown';
   
-  if (hasTranslationPairs(fileContent)) {
+  // Handle both fileContent object and segments array
+  let segments;
+  if (Array.isArray(fileContent)) {
+    segments = fileContent;
+  } else if (fileContent.segments) {
+    segments = fileContent.segments;
+  } else {
+    return 'unknown';
+  }
+  
+  // Check if all segments have both original_text and translated_text
+  const hasTranslations = segments.every(segment => 
+    segment.original_text && 
+    segment.translated_text && 
+    segment.translated_text.trim() !== ''
+  );
+  
+  if (hasTranslations) {
     return 'arabic_urdu_pairs';
   } else {
     return 'arabic_only';

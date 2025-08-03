@@ -27,7 +27,14 @@ import {
   CheckCircle2,
   Layers,
   AlertCircle,
-  Info
+  Info,
+  Sparkles,
+  Activity,
+  ArrowRight,
+  Timer,
+  Award,
+  Filter,
+  Search
 } from 'lucide-react';
 import LLMConfig from './LLMConfig';
 import { 
@@ -45,22 +52,115 @@ const iconMap = {
   'FileText': FileText
 };
 
+// Animated Counter Component
+const AnimatedCounter = ({ value, duration = 1500 }) => {
+  const [count, setCount] = useState(0);
+
+  React.useEffect(() => {
+    let startTime;
+    const animate = (currentTime) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      setCount(Math.floor(progress * value));
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+    requestAnimationFrame(animate);
+  }, [value, duration]);
+
+  return <span>{count}</span>;
+};
+
+// Status Badge Component
+const StatusBadge = ({ status, className = "" }) => {
+  const getStatusConfig = (status) => {
+    switch (status) {
+      case 'completed':
+        return { bg: 'bg-green-100', text: 'text-green-800', icon: CheckCircle, color: 'text-green-500' };
+      case 'failed':
+        return { bg: 'bg-red-100', text: 'text-red-800', icon: XCircle, color: 'text-red-500' };
+      case 'in_progress':
+        return { bg: 'bg-blue-100', text: 'text-blue-800', icon: Loader2, color: 'text-blue-500' };
+      case 'approved':
+        return { bg: 'bg-purple-100', text: 'text-purple-800', icon: Star, color: 'text-purple-500' };
+      default:
+        return { bg: 'bg-gray-100', text: 'text-gray-800', icon: Clock, color: 'text-gray-500' };
+    }
+  };
+
+  const config = getStatusConfig(status);
+  const Icon = config.icon;
+
+  return (
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${config.bg} ${config.text} ${className}`}>
+      <Icon className={`h-3 w-3 mr-1 ${config.color} ${status === 'in_progress' ? 'animate-spin' : ''}`} />
+      {status.replace('_', ' ').toUpperCase()}
+    </span>
+  );
+};
+
+// Progress Ring Component
+const ProgressRing = ({ progress, size = 60, strokeWidth = 4 }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const strokeDasharray = `${circumference} ${circumference}`;
+  const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="relative inline-flex items-center justify-center">
+      <svg
+        className="transform -rotate-90"
+        width={size}
+        height={size}
+      >
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#E5E7EB"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke="#10B981"
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeDasharray={strokeDasharray}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          className="transition-all duration-1000 ease-out"
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold text-gray-700">{Math.round(progress)}%</span>
+      </div>
+    </div>
+  );
+};
+
 const TranslationJobs = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [currentJob, setCurrentJob] = useState(null);
-  const [editingSegment, setEditingSegment] = useState(null);
-  const [editText, setEditText] = useState('');
   const [showConfig, setShowConfig] = useState(false);
-  const [jobProgress, setJobProgress] = useState({});
+  const [showJobDetails, setShowJobDetails] = useState(false);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [approvalNotes, setApprovalNotes] = useState('');
-  const [approvalApprover, setApprovalApprover] = useState('admin');
   const [showExistingTranslationModal, setShowExistingTranslationModal] = useState(false);
   const [selectedFileForTranslation, setSelectedFileForTranslation] = useState(null);
-  const [translationChoice, setTranslationChoice] = useState('use_existing'); // 'use_existing' or 'generate_new'
+  const [useExistingTranslations, setUseExistingTranslations] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [editingSegment, setEditingSegment] = useState(null);
+  const [editedTranslation, setEditedTranslation] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
   const queryClient = useQueryClient();
 
-  // Queries
+  // Data fetching
   const { data: files } = useQuery('files', () => 
     axios.get('/files').then(res => res.data)
   );
@@ -89,18 +189,37 @@ const TranslationJobs = () => {
   );
 
   const { data: llmJobs, refetch: refetchJobs } = useQuery('llmJobs', () => 
-    axios.get('/translate/llm').then(res => res.data),
-    {
-      refetchInterval: 2000, // Poll every 2 seconds for real-time updates
-      refetchIntervalInBackground: true
-    }
-  );
+    axios.get('/translate/llm').then(res => res.data), {
+    refetchInterval: 2000,
+    refetchIntervalInBackground: true
+  });
 
   const { data: llmMetrics } = useQuery('llmMetrics', () => 
-    axios.get('/translate/llm/metrics').then(res => res.data),
-    {
-      refetchInterval: 5000, // Poll every 5 seconds for metrics updates
-      refetchIntervalInBackground: true
+    axios.get('/translate/llm/metrics').then(res => res.data)
+  );
+
+  // Get current job details with enhanced polling
+  const { data: llmJob } = useQuery(
+    ['llmJob', currentJob],
+    () => currentJob ? axios.get(`/translate/llm/job/${currentJob}`).then(res => res.data) : null,
+    { 
+      enabled: !!currentJob,
+      refetchInterval: currentJob ? 1000 : false, // Poll every 1 second for more responsive updates
+      onSuccess: (data) => {
+        if (data && currentJob) {
+          // Show completion notification
+          if (data.status === 'completed' && llmJobs?.find(job => job.job_id === currentJob)?.status !== 'completed') {
+            toast.success(`Translation completed! ${data.completed_segments}/${data.total_segments} segments processed`);
+            refetchJobs(); // Refresh the jobs list
+          }
+          
+          // Show failure notification
+          if (data.status === 'failed' && llmJobs?.find(job => job.job_id === currentJob)?.status !== 'failed') {
+            toast.error('Translation job failed. Check logs for details.');
+            refetchJobs(); // Refresh the jobs list
+          }
+        }
+      }
     }
   );
 
@@ -110,24 +229,9 @@ const TranslationJobs = () => {
     {
       onSuccess: (response) => {
         const jobId = response.data.job_id;
-        toast.success('LLM translation job started! Processing in chunks...');
         setCurrentJob(jobId);
-        
-        // Initialize progress tracking
-        setJobProgress(prev => ({
-          ...prev,
-          [jobId]: {
-            status: 'starting',
-            chunks: [],
-            totalChunks: Math.ceil(response.data.total_segments / 3),
-            completedChunks: 0,
-            currentChunk: 0,
-            startTime: new Date(),
-            lastUpdate: new Date()
-          }
-        }));
-        
-        queryClient.invalidateQueries('llmJobs');
+        toast.success('Translation job started successfully!');
+        refetchJobs();
       },
       onError: (error) => {
         toast.error(error.response?.data?.detail || 'Failed to start translation');
@@ -137,13 +241,16 @@ const TranslationJobs = () => {
 
   const updateTranslationMutation = useMutation(
     ({ jobId, segmentId, translation }) => 
-      axios.post(`/translate/llm/${jobId}/update`, { segment_id: segmentId, translation }),
+      axios.post(`/translate/llm/${jobId}/update`, {
+        segment_id: segmentId,
+        updated_translation: translation
+      }),
     {
       onSuccess: () => {
-        toast.success('Translation updated successfully!');
+        toast.success('Translation updated successfully');
+        queryClient.invalidateQueries(['llmJob', currentJob]);
         setEditingSegment(null);
-        setEditText('');
-        queryClient.invalidateQueries('llmJobs');
+        setEditedTranslation('');
       },
       onError: (error) => {
         toast.error(error.response?.data?.detail || 'Failed to update translation');
@@ -152,15 +259,14 @@ const TranslationJobs = () => {
   );
 
   const approveTranslationMutation = useMutation(
-    ({ jobId, approvedBy, notes }) => 
-      axios.post(`/translate/llm/${jobId}/approve`, { 
-        approved_by: approvedBy || 'admin', 
-        notes: notes || '' 
-      }),
+    ({ jobId, notes }) => 
+      axios.post(`/translate/llm/${jobId}/approve`, { notes }),
     {
-      onSuccess: (response) => {
-        toast.success(`Translation approved! ${response.data.segments_approved} segments moved to ground truth.`);
-        queryClient.invalidateQueries('llmJobs');
+      onSuccess: () => {
+        toast.success('Translation approved and saved to ground truth!');
+        setShowApprovalModal(false);
+        setApprovalNotes('');
+        refetchJobs();
         queryClient.invalidateQueries('groundTruth');
       },
       onError: (error) => {
@@ -169,57 +275,7 @@ const TranslationJobs = () => {
     }
   );
 
-  // Get current job details with enhanced polling
-  const { data: currentJobDetails } = useQuery(
-    ['llmJob', currentJob],
-    () => currentJob ? axios.get(`/translate/llm/job/${currentJob}`).then(res => res.data) : null,
-    { 
-      enabled: !!currentJob,
-      refetchInterval: currentJob ? 1000 : false, // Poll every 1 second for more responsive updates
-      onSuccess: (data) => {
-        if (data && currentJob) {
-          // Update progress tracking
-          setJobProgress(prev => {
-            const current = prev[currentJob] || {};
-            const isCompleted = data.status === 'completed';
-            const isFailed = data.status === 'failed';
-            
-            // Estimate chunk progress based on completed segments
-            const estimatedChunks = Math.ceil(data.total_segments / 3);
-            const completedChunks = Math.floor(data.completed_segments / 3);
-            
-            return {
-              ...prev,
-              [currentJob]: {
-                ...current,
-                status: data.status,
-                completedSegments: data.completed_segments,
-                totalSegments: data.total_segments,
-                completedChunks: Math.min(completedChunks, estimatedChunks),
-                totalChunks: estimatedChunks,
-                lastUpdate: new Date(),
-                isCompleted,
-                isFailed,
-                completionTime: isCompleted ? new Date() : current.completionTime
-              }
-            };
-          });
-          
-          // Show completion notification
-          if (data.status === 'completed' && !jobProgress[currentJob]?.isCompleted) {
-            const duration = new Date() - (jobProgress[currentJob]?.startTime || new Date());
-            toast.success(`Translation completed! Took ${Math.round(duration / 1000)}s`);
-          }
-          
-          // Show failure notification
-          if (data.status === 'failed' && !jobProgress[currentJob]?.isFailed) {
-            toast.error('Translation job failed. Check logs for details.');
-          }
-        }
-      }
-    }
-  );
-
+  // Helper functions
   const startLLMTranslation = () => {
     if (!selectedFile || !fileContent) {
       toast.error('Please select a file first');
@@ -227,7 +283,7 @@ const TranslationJobs = () => {
     }
 
     // Check file classification
-    const classification = getFileClassification(fileContent);
+    const classification = getFileClassification(fileContent.segments);
     
     if (classification === 'arabic_urdu_pairs') {
       // Show modal for existing translations
@@ -274,78 +330,44 @@ const TranslationJobs = () => {
     });
   };
 
-  const handleEditTranslation = (segment) => {
-    setEditingSegment(segment.segment_id);
-    setEditText(segment.llm_translation || '');
+  const handleExistingTranslationChoice = (useExisting) => {
+    setShowExistingTranslationModal(false);
+    proceedWithTranslation(useExisting);
   };
 
-  const saveTranslation = () => {
-    if (!currentJob || !editingSegment || !editText.trim()) return;
+  const handleEditTranslation = (segment) => {
+    setEditingSegment(segment.segment_id);
+    setEditedTranslation(segment.llm_translation || '');
+  };
+
+  const handleSaveEdit = () => {
+    if (!editingSegment || !editedTranslation.trim()) {
+      toast.error('Please enter a translation');
+      return;
+    }
 
     updateTranslationMutation.mutate({
       jobId: currentJob,
       segmentId: editingSegment,
-      translation: editText.trim()
+      translation: editedTranslation
     });
   };
 
-  const handleApproveTranslation = () => {
-    if (!currentJob) return;
-    
+  const handleApproveJob = () => {
     approveTranslationMutation.mutate({
       jobId: currentJob,
-      approvedBy: approvalApprover,
       notes: approvalNotes
     });
-    
-    setShowApprovalModal(false);
-    setApprovalNotes('');
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'completed':
-        return <CheckCircle2 className="h-5 w-5 text-green-500" />;
-      case 'in_progress':
-        return <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />;
-      case 'failed':
-        return <XCircle className="h-5 w-5 text-red-500" />;
-      default:
-        return <Clock className="h-5 w-5 text-gray-400" />;
-    }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'in_progress':
-        return 'bg-blue-100 text-blue-800';
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'completed': return 'text-green-600';
+      case 'failed': return 'text-red-600';
+      case 'in_progress': return 'text-blue-600';
+      case 'approved': return 'text-purple-600';
+      default: return 'text-gray-600';
     }
-  };
-
-  const getProgressPercentage = (jobId) => {
-    const progress = jobProgress[jobId];
-    if (!progress) return 0;
-    
-    if (progress.isCompleted) return 100;
-    if (progress.isFailed) return 0;
-    
-    return Math.round((progress.completedSegments / progress.totalSegments) * 100);
-  };
-
-  const getChunkProgress = (jobId) => {
-    const progress = jobProgress[jobId];
-    if (!progress) return { completed: 0, total: 0 };
-    
-    return {
-      completed: progress.completedChunks,
-      total: progress.totalChunks
-    };
   };
 
   const formatDuration = (startTime) => {
@@ -357,538 +379,588 @@ const TranslationJobs = () => {
     return `${minutes}m ${seconds % 60}s`;
   };
 
+  // Filter and search logic
+  const filteredJobs = llmJobs?.filter(job => {
+    const matchesSearch = job.file_id.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || job.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  }).sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) || [];
+
+  // Calculate metrics
+  const totalJobs = llmJobs?.length || 0;
+  const completedJobs = llmJobs?.filter(job => job.status === 'completed').length || 0;
+  const inProgressJobs = llmJobs?.filter(job => job.status === 'in_progress').length || 0;
+  const failedJobs = llmJobs?.filter(job => job.status === 'failed').length || 0;
+  const approvedJobs = llmJobs?.filter(job => job.status === 'approved').length || 0;
+
+
+
   return (
-    <div className="min-h-screen bg-gray-50 -mt-8">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-900 to-purple-800 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 -mt-8">
+      {/* Hero Header */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 shadow-xl">
+        <div className="absolute inset-0 bg-black opacity-10"></div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">LLM Translation Jobs</h1>
-              <p className="text-purple-100 mt-1">AI-powered Arabic to Urdu translation using LLM of your choice with intelligent chunking</p>
+            <div className="flex-1">
+              <div className="text-center">
+                <h1 className="text-4xl font-bold text-white mb-4 flex items-center justify-center">
+                  <Brain className="h-8 w-8 mr-3 text-blue-300" />
+                  LLM Translation Jobs
+                  <Sparkles className="h-8 w-8 ml-3 text-yellow-300" />
+                </h1>
+                <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+                  AI-powered Arabic to Urdu translation using LLM of your choice with intelligent chunking and real-time progress tracking
+                </p>
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
+            
+            <div className="absolute top-6 right-6">
               <button
                 onClick={() => setShowConfig(!showConfig)}
-                className="flex items-center px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                className="flex items-center px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-xl hover:bg-white/20 transition-all duration-300 transform hover:scale-105 border border-white/20"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                {showConfig ? 'Hide Config' : 'Show Config'}
+                <Settings className="h-5 w-5 mr-2" />
+                {showConfig ? 'Hide Config' : 'LLM Config'}
               </button>
-              <div className="bg-purple-700 rounded-lg p-3">
-                <Brain className="h-8 w-8 text-purple-200" />
-              </div>
             </div>
           </div>
         </div>
+        
+        <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-50 to-transparent"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 -mt-10 relative z-10">
+        
         {/* LLM Configuration */}
         {showConfig && (
-          <div className="mb-8">
+          <div className="mb-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50">
             <LLMConfig />
           </div>
         )}
         
         {/* Metrics Dashboard */}
         {llmMetrics && (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="bg-purple-100 rounded-lg p-3">
-                  <FileText className="h-6 w-6 text-purple-600" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+            {/* Total Jobs */}
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-100 text-sm font-medium">Total Jobs</p>
+                  <p className="text-3xl font-bold"><AnimatedCounter value={llmMetrics.total_jobs} /></p>
+                  <div className="flex items-center mt-1">
+                    <Activity className="h-3 w-3 text-blue-200 mr-1" />
+                    <p className="text-blue-200 text-xs">Translation tasks</p>
+                  </div>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Jobs</p>
-                  <p className="text-2xl font-bold text-gray-900">{llmMetrics.total_jobs}</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="bg-green-100 rounded-lg p-3">
-                  <CheckCircle className="h-6 w-6 text-green-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Completed</p>
-                  <p className="text-2xl font-bold text-gray-900">{llmMetrics.completed_jobs}</p>
+                <div className="bg-blue-400/30 rounded-xl p-3">
+                  <FileText className="h-8 w-8" />
                 </div>
               </div>
             </div>
-            
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="bg-blue-100 rounded-lg p-3">
-                  <Target className="h-6 w-6 text-blue-600" />
+
+            {/* Completed Jobs */}
+            <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-100 text-sm font-medium">Completed</p>
+                  <p className="text-3xl font-bold"><AnimatedCounter value={llmMetrics.completed_jobs} /></p>
+                  <div className="flex items-center mt-1">
+                    <CheckCircle className="h-3 w-3 text-green-200 mr-1" />
+                    <p className="text-green-200 text-xs">Successfully done</p>
+                  </div>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Avg Confidence</p>
-                  <p className="text-2xl font-bold text-gray-900">{(llmMetrics.average_confidence * 100).toFixed(1)}%</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="bg-yellow-100 rounded-lg p-3">
-                  <Star className="h-6 w-6 text-yellow-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Avg Quality</p>
-                  <p className="text-2xl font-bold text-gray-900">{(llmMetrics.average_quality_score * 100).toFixed(1)}%</p>
+                <div className="bg-green-400/30 rounded-xl p-3">
+                  <CheckCircle className="h-8 w-8" />
                 </div>
               </div>
             </div>
-            
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <div className="flex items-center">
-                <div className="bg-orange-100 rounded-lg p-3">
-                  <Zap className="h-6 w-6 text-orange-600" />
+
+            {/* Average Confidence */}
+            <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-yellow-100 text-sm font-medium">Avg Confidence</p>
+                  <p className="text-3xl font-bold">{(llmMetrics.average_confidence * 100).toFixed(1)}%</p>
+                  <div className="flex items-center mt-1">
+                    <Target className="h-3 w-3 text-yellow-200 mr-1" />
+                    <p className="text-yellow-200 text-xs">AI certainty</p>
+                  </div>
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Avg Time</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div className="bg-yellow-400/30 rounded-xl p-3">
+                  <Target className="h-8 w-8" />
+                </div>
+              </div>
+            </div>
+
+            {/* Quality Score */}
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-100 text-sm font-medium">Quality Score</p>
+                  <p className="text-3xl font-bold">{(llmMetrics.average_quality_score * 100).toFixed(1)}%</p>
+                  <div className="flex items-center mt-1">
+                    <Award className="h-3 w-3 text-purple-200 mr-1" />
+                    <p className="text-purple-200 text-xs">Translation quality</p>
+                  </div>
+                </div>
+                <div className="bg-purple-400/30 rounded-xl p-3">
+                  <Award className="h-8 w-8" />
+                </div>
+              </div>
+            </div>
+
+            {/* Average Time */}
+            <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl shadow-xl p-6 text-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-indigo-100 text-sm font-medium">Avg Time</p>
+                  <p className="text-3xl font-bold">
                     {llmMetrics.average_translation_time ? 
                       `${llmMetrics.average_translation_time.toFixed(2)}s` : 
                       'N/A'
                     }
                   </p>
+                  <div className="flex items-center mt-1">
+                    <Timer className="h-3 w-3 text-indigo-200 mr-1" />
+                    <p className="text-indigo-200 text-xs">Per segment</p>
+                  </div>
+                </div>
+                <div className="bg-indigo-400/30 rounded-xl p-3">
+                  <Timer className="h-8 w-8" />
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* File Selection and Translation Controls */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* File Selection */}
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">
-                Select File for Translation
-              </label>
-              <select
-                value={selectedFile || ''}
-                onChange={(e) => setSelectedFile(e.target.value || null)}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white"
-              >
-                <option value="">Choose a file...</option>
-                {files?.map(file => {
-                  const fileContent = allFileContents?.find(fc => fc.file_id === file.file_id);
-                  const classification = fileContent ? getFileClassification(fileContent) : 'unknown';
-                  const statusText = getFileStatusText(classification);
-                  
-                  return (
-                    <option key={file.file_id} value={file.file_id}>
-                      {file.filename} ({file.segments_count} segments) - {statusText}
-                    </option>
-                  );
-                })}
-              </select>
-              
-              {/* File Status Display */}
-              {selectedFile && fileContent && (
-                <div className="mt-3">
-                  {(() => {
-                    const classification = getFileClassification(fileContent);
-                    const statusText = getFileStatusText(classification);
-                    const statusColor = getFileStatusColor(classification);
-                    const StatusIcon = iconMap[getFileStatusIcon(classification)];
-                    
-                    return (
-                      <div className={`inline-flex items-center px-3 py-2 rounded-lg border text-sm font-medium ${statusColor}`}>
-                        <StatusIcon className="h-4 w-4 mr-2" />
-                        {statusText}
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
+        {/* Main Content Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          
+          {/* File Selection & Job Creation */}
+          <div className="lg:col-span-1">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-white/50">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 flex items-center">
+                  <Layers className="h-5 w-5 mr-2 text-blue-500" />
+                  Start New Translation
+                </h3>
+              </div>
 
-            {/* Translation Controls */}
-            <div className="flex items-end space-x-4">
-              <button
-                onClick={startLLMTranslation}
-                disabled={!selectedFile || startTranslationMutation.isLoading}
-                className="flex items-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {startTranslationMutation.isLoading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Starting...
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 mr-2" />
-                    Start LLM Translation
-                  </>
-                )}
-              </button>
-              
-              <button
-                onClick={refetchJobs}
-                className="flex items-center px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-3">
+                    Select File for Translation
+                  </label>
+                  <select
+                    value={selectedFile || ''}
+                    onChange={(e) => setSelectedFile(e.target.value || null)}
+                    className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white/50 backdrop-blur-sm transition-all duration-200"
+                  >
+                    <option value="">Choose a file...</option>
+                                         {files?.map(file => {
+                       const fileContent = allFileContents?.find(fc => fc.file_id === file.file_id);
+                       const classification = fileContent ? getFileClassification(fileContent.segments) : 'unknown';
+                       const statusText = getFileStatusText(classification);
+                       
+                       return (
+                         <option key={file.file_id} value={file.file_id}>
+                           {file.filename} ({file.segments_count} segments) - {statusText}
+                         </option>
+                       );
+                     })}
+                  </select>
+                </div>
+
+                                 {/* File Status Display */}
+                 {selectedFile && fileContent && (
+                   <div className="mt-3">
+                     {(() => {
+                       const classification = getFileClassification(fileContent.segments);
+                       const statusText = getFileStatusText(classification);
+                       const statusColor = getFileStatusColor(classification);
+                       const StatusIcon = iconMap[getFileStatusIcon(classification)];
+                       
+                       return (
+                         <div className={`inline-flex items-center px-3 py-2 rounded-lg border text-sm font-medium ${statusColor}`}>
+                           <StatusIcon className="h-4 w-4 mr-2" />
+                           {statusText}
+                         </div>
+                       );
+                     })()}
+                   </div>
+                 )}
+
+                                 <button
+                   onClick={startLLMTranslation}
+                   disabled={!selectedFile || startTranslationMutation.isLoading}
+                   className="w-full flex items-center justify-center px-6 py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 shadow-lg"
+                 >
+                   {startTranslationMutation.isLoading ? (
+                     <>
+                       <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                       Starting Translation...
+                     </>
+                   ) : (
+                     <>
+                       <Play className="h-5 w-5 mr-2" />
+                       Start LLM Translation
+                     </>
+                   )}
+                 </button>
+              </div>
             </div>
           </div>
 
-          {/* Enhanced Current Job Status */}
-          {currentJobDetails && (
-            <div className="border-t border-gray-200 pt-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Current Translation Job</h3>
-                <div className="flex items-center space-x-4">
-                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(currentJobDetails.status)}`}>
-                    {getStatusIcon(currentJobDetails.status)}
-                    <span className="ml-1 capitalize">{currentJobDetails.status.replace('_', ' ')}</span>
-                  </span>
-                  {jobProgress[currentJob] && (
-                    <span className="text-sm text-gray-600">
-                      Duration: {formatDuration(jobProgress[currentJob].startTime)}
-                    </span>
-                  )}
+          {/* Jobs List */}
+          <div className="lg:col-span-3">
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl border border-white/50">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-800 flex items-center">
+                    <Activity className="h-5 w-5 mr-2 text-purple-500" />
+                    Translation Jobs
+                  </h3>
+                  <button
+                    onClick={refetchJobs}
+                    className="flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh
+                  </button>
                 </div>
-              </div>
-              
-              {/* Enhanced Progress Information */}
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">{currentJobDetails.completed_segments}</div>
-                  <div className="text-sm text-gray-600">of {currentJobDetails.total_segments} segments</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {currentJobDetails.average_confidence ? (currentJobDetails.average_confidence * 100).toFixed(1) : '0'}%
+
+                {/* Search and Filter */}
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search jobs by file name..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
                   </div>
-                  <div className="text-sm text-gray-600">Confidence</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {currentJobDetails.average_quality_score ? (currentJobDetails.average_quality_score * 100).toFixed(1) : '0'}%
-                  </div>
-                  <div className="text-sm text-gray-600">Quality Score</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-gray-900">
-                    {getProgressPercentage(currentJob)}%
-                  </div>
-                  <div className="text-sm text-gray-600">Progress</div>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-center">
-                    <Layers className="h-6 w-6 text-purple-600 mr-2" />
-                    <div>
-                      <div className="text-2xl font-bold text-gray-900">
-                        {getChunkProgress(currentJob).completed}/{getChunkProgress(currentJob).total}
-                      </div>
-                      <div className="text-sm text-gray-600">Chunks</div>
-                    </div>
-                  </div>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="all">All Status</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                    <option value="failed">Failed</option>
+                    <option value="approved">Approved</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Enhanced Progress Bar */}
-              <div className="space-y-3">
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Overall Progress</span>
-                  <span>{getProgressPercentage(currentJob)}%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
-                  <div
-                    className="bg-purple-600 h-3 rounded-full transition-all duration-500 ease-out"
-                    style={{ width: `${getProgressPercentage(currentJob)}%` }}
-                  ></div>
-                </div>
-                
-                {/* Chunk Progress */}
-                {currentJobDetails.status === 'in_progress' && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>Chunk Processing</span>
-                      <span>{getChunkProgress(currentJob).completed}/{getChunkProgress(currentJob).total} chunks</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full transition-all duration-500 ease-out"
-                        style={{ width: `${(getChunkProgress(currentJob).completed / getChunkProgress(currentJob).total) * 100}%` }}
-                      ></div>
-                    </div>
+              <div className="max-h-[32rem] overflow-y-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50 sticky top-0 z-10">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Job</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metrics</th>
+                      <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {filteredJobs.map((job) => {
+                      const progress = job.total_segments > 0 ? (job.completed_segments / job.total_segments) * 100 : 0;
+                      
+                      return (
+                        <tr key={job.job_id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{job.file_id}</div>
+                              <div className="text-sm text-gray-500">
+                                {job.completed_segments}/{job.total_segments} segments
+                              </div>
+                              <div className="text-xs text-gray-400">
+                                {new Date(job.created_at).toLocaleString()}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center space-x-3">
+                              <ProgressRing progress={progress} size={50} strokeWidth={3} />
+                              <div className="text-sm text-gray-600">
+                                {Math.round(progress)}%
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <StatusBadge status={job.status} />
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            <div className="space-y-1">
+                              <div>Conf: {job.average_confidence ? (job.average_confidence * 100).toFixed(1) : '-'}%</div>
+                              <div>Qual: {job.average_quality_score ? (job.average_quality_score * 100).toFixed(1) : '-'}%</div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => {
+                                  setCurrentJob(job.job_id);
+                                  setShowJobDetails(true);
+                                }}
+                                className="flex items-center px-3 py-1 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                View
+                              </button>
+                              {job.status === 'completed' && (
+                                <button
+                                  onClick={() => {
+                                    setCurrentJob(job.job_id);
+                                    setShowApprovalModal(true);
+                                  }}
+                                  className="flex items-center px-3 py-1 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors text-sm"
+                                >
+                                  <CheckCircle className="h-4 w-4 mr-1" />
+                                  Approve
+                                </button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                {filteredJobs.length === 0 && (
+                  <div className="text-center py-12">
+                    <Brain className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No translation jobs found</h3>
+                    <p className="text-gray-500">Start your first translation job by selecting a file above.</p>
                   </div>
                 )}
               </div>
-              
-              {/* Approval Button for Completed Jobs */}
-              {currentJobDetails.status === 'completed' && (
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="text-lg font-semibold text-gray-900">Ready for Approval</h4>
-                      <p className="text-sm text-gray-600 mt-1">
-                        Review the translations below and approve to move to ground truth
-                      </p>
-                    </div>
-                    {(() => {
-                      const hasFailedSegments = currentJobDetails.segments.some(
-                        segment => segment.llm_translation && segment.llm_translation.startsWith("[Translation failed:")
-                      );
-                      
-                      if (hasFailedSegments) {
-                        return (
-                          <div className="flex items-center px-4 py-2 bg-red-100 text-red-800 rounded-lg">
-                            <XCircle className="h-4 w-4 mr-2" />
-                            Cannot approve - some segments failed
-                          </div>
-                        );
-                      }
-                      
-                      return (
-                        <button
-                          onClick={() => setShowApprovalModal(true)}
-                          disabled={approveTranslationMutation.isLoading}
-                          className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {approveTranslationMutation.isLoading ? (
-                            <>
-                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              Approving...
-                            </>
-                          ) : (
-                            <>
-                              <CheckCircle className="h-4 w-4 mr-2" />
-                              Approve Translation
-                            </>
-                          )}
-                        </button>
-                      );
-                    })()}
-                  </div>
-                </div>
-              )}
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Translation Results */}
-        {currentJobDetails && currentJobDetails.segments && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Translation Results</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Showing {currentJobDetails.segments.length} segments
-              </p>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Segment
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Original (Arabic)
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      LLM Translation (Urdu)
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Confidence
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Quality
-                    </th>
-                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {currentJobDetails.segments.map((segment, index) => {
-                    const isFailed = segment.llm_translation && segment.llm_translation.startsWith("[Translation failed:");
-                    return (
-                      <tr key={segment.segment_id} className={`hover:bg-gray-50 transition-colors ${isFailed ? 'bg-red-50' : ''}`}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {index + 1}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900" dir="rtl">
-                          <div className="max-w-xs">{segment.original_text}</div>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900" dir="rtl">
-                          {editingSegment === segment.segment_id ? (
-                            <div className="space-y-2">
-                              <textarea
-                                value={editText}
-                                onChange={(e) => setEditText(e.target.value)}
-                                className="w-full p-2 border border-gray-300 rounded text-sm"
-                                rows={3}
-                                dir="rtl"
-                              />
-                              <div className="flex space-x-2">
-                                <button
-                                  onClick={saveTranslation}
-                                  className="px-3 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
-                                >
-                                  Save
-                                </button>
-                                <button
-                                  onClick={() => setEditingSegment(null)}
-                                  className="px-3 py-1 bg-gray-600 text-white rounded text-xs hover:bg-gray-700"
-                                >
-                                  Cancel
-                                </button>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className={`max-w-xs ${isFailed ? 'text-red-600 font-medium' : ''}`}>
-                              {segment.llm_translation || 'Pending...'}
-                              {isFailed && (
-                                <div className="mt-1">
+        {/* Job Details Modal */}
+        {showJobDetails && llmJob && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 rounded-t-2xl">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xl font-semibold text-white flex items-center">
+                    <FileText className="h-5 w-5 mr-2" />
+                    Translation Job Details
+                  </h3>
+                  <button
+                    onClick={() => setShowJobDetails(false)}
+                    className="text-white hover:text-gray-200 transition-colors"
+                  >
+                    <XCircle className="h-6 w-6" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+                {/* Job Summary */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-blue-50 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-blue-600">{llmJob.completed_segments}</div>
+                    <div className="text-sm text-blue-600">Completed</div>
+                  </div>
+                  <div className="bg-green-50 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-green-600">
+                      {llmJob.average_confidence ? (llmJob.average_confidence * 100).toFixed(1) : '0'}%
+                    </div>
+                    <div className="text-sm text-green-600">Confidence</div>
+                  </div>
+                  <div className="bg-purple-50 rounded-xl p-4">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {llmJob.average_quality_score ? (llmJob.average_quality_score * 100).toFixed(1) : '0'}%
+                    </div>
+                    <div className="text-sm text-purple-600">Quality</div>
+                  </div>
+                  <div className="bg-yellow-50 rounded-xl p-4">
+                    <StatusBadge status={llmJob.status} />
+                  </div>
+                </div>
+
+                {/* Segments Table */}
+                <div className="bg-gray-50 rounded-xl overflow-hidden">
+                  <div className="px-4 py-3 bg-gray-100">
+                    <h4 className="font-medium text-gray-900">Translation Segments</h4>
+                  </div>
+                  <div className="max-h-96 overflow-y-auto">
+                    <table className="w-full">
+                      <thead className="bg-gray-100 sticky top-0">
+                        <tr>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Segment</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Original</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Translation</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Metrics</th>
+                          <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {llmJob.segments?.map((segment) => {
+                          const isFailed = segment.llm_translation?.startsWith('[Translation failed:');
+                          
+                          return (
+                            <tr key={segment.segment_id} className={isFailed ? 'bg-red-50' : 'bg-white'}>
+                              <td className="px-4 py-3 text-sm text-gray-900">
+                                {segment.segment_id}
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
+                                {segment.original_text}
+                              </td>
+                              <td className="px-4 py-3 text-sm">
+                                {editingSegment === segment.segment_id ? (
+                                  <div className="space-y-2">
+                                    <textarea
+                                      value={editedTranslation}
+                                      onChange={(e) => setEditedTranslation(e.target.value)}
+                                      className="w-full p-2 border border-gray-300 rounded-lg resize-none"
+                                      rows={3}
+                                    />
+                                    <div className="flex space-x-2">
+                                      <button
+                                        onClick={handleSaveEdit}
+                                        className="flex items-center px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm"
+                                      >
+                                        <Save className="h-3 w-3 mr-1" />
+                                        Save
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setEditingSegment(null);
+                                          setEditedTranslation('');
+                                        }}
+                                        className="px-3 py-1 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 text-sm"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className={isFailed ? 'text-red-600' : 'text-gray-900'}>
+                                    {segment.llm_translation || 'No translation'}
+                                  </div>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-600">
+                                <div className="space-y-1">
+                                  <div>Conf: {isFailed ? '0%' : segment.confidence_score ? `${(segment.confidence_score * 100).toFixed(1)}%` : '-'}</div>
+                                  <div>Qual: {isFailed ? '0%' : segment.quality_metrics?.overall_quality_score ? `${(segment.quality_metrics.overall_quality_score * 100).toFixed(1)}%` : '-'}</div>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3">
+                                {!isFailed && llmJob.status === 'completed' && (
+                                  <button
+                                    onClick={() => handleEditTranslation(segment)}
+                                    className="flex items-center px-2 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 text-sm"
+                                  >
+                                    <Edit3 className="h-3 w-3 mr-1" />
+                                    Edit
+                                  </button>
+                                )}
+                                {isFailed && (
                                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
                                     <XCircle className="h-3 w-3 mr-1" />
                                     Failed
                                   </span>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {isFailed ? (
-                            <span className="text-red-600">0%</span>
-                          ) : (
-                            segment.confidence_score ? `${(segment.confidence_score * 100).toFixed(1)}%` : '-'
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {isFailed ? (
-                            <span className="text-red-600">0%</span>
-                          ) : (
-                            segment.quality_metrics?.overall_quality_score ? `${(segment.quality_metrics.overall_quality_score * 100).toFixed(1)}%` : '-'
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {!isFailed && (
-                            <button
-                              onClick={() => handleEditTranslation(segment)}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              <Edit3 className="h-4 w-4" />
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-4 mt-6">
+                  <button
+                    onClick={() => setShowJobDetails(false)}
+                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Close
+                  </button>
+                  {llmJob.status === 'completed' && (
+                    <button
+                      onClick={() => {
+                        setShowJobDetails(false);
+                        setShowApprovalModal(true);
+                      }}
+                      className="px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105"
+                    >
+                      Approve Translation
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
 
-        {/* Recent Jobs */}
-        {llmJobs && llmJobs.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-lg font-semibold text-gray-900">Recent Translation Jobs</h3>
-                <p className="text-sm text-gray-600 mt-1">Latest LLM translation jobs and their status</p>
+        {/* Approval Modal */}
+        {showApprovalModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+              <div className="bg-gradient-to-r from-green-500 to-green-600 px-6 py-4 rounded-t-2xl">
+                <h3 className="text-lg font-semibold text-white flex items-center">
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  Approve Translation
+                </h3>
               </div>
-              <button
-                onClick={() => refetchJobs()}
-                className="flex items-center px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh
-              </button>
-            </div>
-            
-            <div className="overflow-x-auto">
-              <div className="max-h-[32rem] overflow-y-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50 sticky top-0 z-10">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Job ID
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        File ID
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Progress
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Confidence
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Quality
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Created
-                      </th>
-                      <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                        Actions
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {llmJobs
-                      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-                      .map((job) => (
-                      <tr key={job.job_id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {job.job_id.slice(-8)}...
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {job.file_id.slice(-8)}...
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(job.status)}`}>
-                            {getStatusIcon(job.status)}
-                            <span className="ml-1 capitalize">{job.status.replace('_', ' ')}</span>
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center space-x-2">
-                            <div className="w-16 bg-gray-200 rounded-full h-2">
-                              <div
-                                className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${(job.completed_segments / job.total_segments) * 100}%` }}
-                              ></div>
-                            </div>
-                            <span className="text-sm text-gray-600">
-                              {job.completed_segments}/{job.total_segments}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {job.average_confidence ? (job.average_confidence * 100).toFixed(1) : '-'}%
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {job.average_quality_score ? (job.average_quality_score * 100).toFixed(1) : '-'}%
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(job.created_at).toLocaleString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <button
-                            onClick={() => setCurrentJob(job.job_id)}
-                            className="text-purple-600 hover:text-purple-900"
-                          >
-                            <Eye className="h-4 w-4" />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              
+              <div className="p-6">
+                <p className="text-gray-600 mb-4">
+                  Are you sure you want to approve this translation? It will be saved to ground truth data.
+                </p>
+                
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    value={approvalNotes}
+                    onChange={(e) => setApprovalNotes(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    rows={3}
+                    placeholder="Add any notes about this approval..."
+                  />
+                </div>
+                
+                <div className="flex justify-end space-x-3">
+                  <button
+                    onClick={() => {
+                      setShowApprovalModal(false);
+                      setApprovalNotes('');
+                    }}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleApproveJob}
+                    disabled={approveTranslationMutation.isLoading}
+                    className="px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 disabled:opacity-50 transition-all duration-300 transform hover:scale-105"
+                  >
+                    {approveTranslationMutation.isLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin inline" />
+                        Approving...
+                      </>
+                    ) : (
+                      'Approve Translation'
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -896,20 +968,17 @@ const TranslationJobs = () => {
 
         {/* Existing Translation Modal */}
         {showExistingTranslationModal && selectedFileForTranslation && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-lg mx-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">File Has Existing Translations</h3>
-                <button
-                  onClick={() => setShowExistingTranslationModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XCircle className="h-5 w-5" />
-                </button>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+              <div className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-4 rounded-t-2xl">
+                <h3 className="text-lg font-semibold text-white flex items-center">
+                  <Info className="h-5 w-5 mr-2" />
+                  File Has Existing Translations
+                </h3>
               </div>
               
-              <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="p-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
                   <div className="flex items-start">
                     <Info className="h-5 w-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
                     <div>
@@ -924,132 +993,32 @@ const TranslationJobs = () => {
                 </div>
                 
                 <div className="space-y-3">
-                  <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="translationChoice"
-                      value="use_existing"
-                      checked={translationChoice === 'use_existing'}
-                      onChange={(e) => setTranslationChoice(e.target.value)}
-                      className="text-purple-600 focus:ring-purple-500"
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">Use Existing Translations</div>
-                      <div className="text-sm text-gray-600">
-                        Use the translations already present in the file. This will create a translation job with existing translations.
-                      </div>
-                    </div>
-                  </label>
+                  <button
+                    onClick={() => handleExistingTranslationChoice(true)}
+                    className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-xl hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <CheckCircle className="h-5 w-5 mr-2" />
+                    Use Existing Translations
+                  </button>
                   
-                  <label className="flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
-                    <input
-                      type="radio"
-                      name="translationChoice"
-                      value="generate_new"
-                      checked={translationChoice === 'generate_new'}
-                      onChange={(e) => setTranslationChoice(e.target.value)}
-                      className="text-purple-600 focus:ring-purple-500"
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">Generate New LLM Translations</div>
-                      <div className="text-sm text-gray-600">
-                        Ignore existing translations and generate new ones using the LLM. This will overwrite existing translations.
-                      </div>
-                    </div>
-                  </label>
+                  <button
+                    onClick={() => handleExistingTranslationChoice(false)}
+                    className="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <Brain className="h-5 w-5 mr-2" />
+                    Generate New LLM Translations
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setShowExistingTranslationModal(false);
+                      setSelectedFileForTranslation(null);
+                    }}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
                 </div>
-                
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                  <p className="text-sm text-yellow-800">
-                    <strong>Note:</strong> After translation, you can review and approve the results to move them to ground truth.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowExistingTranslationModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={() => {
-                    setShowExistingTranslationModal(false);
-                    proceedWithTranslation(translationChoice === 'use_existing');
-                  }}
-                  className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
-                >
-                  Continue
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Approval Modal */}
-        {showApprovalModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md mx-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Approve Translation</h3>
-                <button
-                  onClick={() => setShowApprovalModal(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <XCircle className="h-5 w-5" />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Approved By
-                  </label>
-                  <input
-                    type="text"
-                    value={approvalApprover}
-                    onChange={(e) => setApprovalApprover(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="Enter your name"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Notes (Optional)
-                  </label>
-                  <textarea
-                    value={approvalNotes}
-                    onChange={(e) => setApprovalNotes(e.target.value)}
-                    rows={3}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                    placeholder="Add any notes about this translation..."
-                  />
-                </div>
-                
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-sm text-blue-800">
-                    <strong>Note:</strong> This will move {currentJobDetails?.segments?.length || 0} segments to the ground truth database. 
-                    You can review and edit individual segments before approving.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowApprovalModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleApproveTranslation}
-                  disabled={approveTranslationMutation.isLoading}
-                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {approveTranslationMutation.isLoading ? 'Approving...' : 'Approve & Save'}
-                </button>
               </div>
             </div>
           </div>
